@@ -1,5 +1,8 @@
-import 'package:bangfeed/screens/select_stage.dart';
 import 'package:flutter/material.dart';
+
+// ✅ Tes pages cibles (vérifie bien les noms de classes internes)
+import 'package:bangfeed/screens/select_age_page/pig_age_page.dart';
+import 'package:bangfeed/screens/select_age_page/poulet_chair_age_page.dart';
 
 class AnimalSelectionPage extends StatefulWidget {
   const AnimalSelectionPage({super.key});
@@ -12,53 +15,52 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
   String? selectedAnimal;
 
   final List<Map<String, dynamic>> animals = [
- 
     {
       'name': 'Porc',
       'icon': '🐷',
-      'color': Color(0xFF2D5F4F),
+      'color': const Color(0xFFD97706), // Orange unifié
     },
     {
       'name': 'Poulet de chair',
       'icon': '🐔',
-      'color': Color(0xFF2D5F4F),
+      'color': const Color(0xFFD97706),
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFFF6E8),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo/Titre
+              // Logo ou titre
               const Text(
                 'BangFeed',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B4332),
+                  color: Color(0xFF4B2E2A),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Étape
               const Text(
                 'Étape 1/4 : Choisir l\'animal',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Color(0xFF4B2E2A),
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Grille d'animaux
               Expanded(
                 child: GridView.builder(
@@ -72,20 +74,21 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
                   itemBuilder: (context, index) {
                     final animal = animals[index];
                     final isSelected = selectedAnimal == animal['name'];
-                    
+
                     return GestureDetector(
                       onTap: () {
                         setState(() {
                           selectedAnimal = animal['name'];
                         });
                       },
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isSelected 
-                                ? animal['color'] 
+                            color: isSelected
+                                ? animal['color']
                                 : Colors.grey[300]!,
                             width: isSelected ? 3 : 1.5,
                           ),
@@ -101,7 +104,7 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Icône personnalisée
+                            // Icône stylisée
                             Container(
                               width: 80,
                               height: 80,
@@ -110,22 +113,23 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Center(
-                                child: _buildAnimalIcon(animal['name'], animal['color']),
+                                child: _buildAnimalIcon(
+                                  animal['name'],
+                                  animal['color'],
+                                ),
                               ),
                             ),
-                            
                             const SizedBox(height: 12),
-                            
-                            // Nom
+                            // Nom de l’animal
                             Text(
                               animal['name'],
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: isSelected 
-                                    ? animal['color'] 
-                                    : Colors.black87,
+                                color: isSelected
+                                    ? animal['color']
+                                    : const Color(0xFF4B2E2A),
                               ),
                             ),
                           ],
@@ -135,34 +139,45 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
                   },
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Bouton Suivant
               SizedBox(
                 width: double.infinity,
-                child: 
-                ElevatedButton(
-                  onPressed: selectedAnimal == null ? null : () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StageSelectionPage(animal: selectedAnimal!)  // ✅ Correct
-                      ),
-                    );
-                  },
+                child: ElevatedButton(
+                  onPressed: selectedAnimal == null
+                      ? null
+                      : () {
+                          Widget nextPage;
+
+                          switch (selectedAnimal) {
+                            case 'Porc':
+                              nextPage = const StagePorcPage(); // ✅ Vérifie le nom
+                              break;
+                            case 'Poulet de chair':
+                              nextPage = const StagePouletPage(); // ✅ Vérifie le nom
+                              break;
+                            default:
+                              nextPage = const Placeholder();
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => nextPage),
+                          );
+                        },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: selectedAnimal != null 
-                        ? const Color(0xFF2D5F4F) 
+                    backgroundColor: selectedAnimal != null
+                        ? const Color(0xFFD97706)
                         : Colors.grey[300],
-                    foregroundColor: Colors.white,
+                    foregroundColor: selectedAnimal != null
+                        ? Colors.white
+                        : Colors.grey[600],
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: selectedAnimal != null ? 2 : 0,
-                    disabledBackgroundColor: Colors.grey[300],
-                    disabledForegroundColor: Colors.grey[500],
                   ),
                   child: const Text(
                     'Suivant',
@@ -182,19 +197,18 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
 
   Widget _buildAnimalIcon(String animalName, Color color) {
     IconData iconData;
-    
-    switch (animalName) {
 
+    switch (animalName) {
       case 'Porc':
-        iconData = Icons.set_meal; // Cochon stylisé
+        iconData = Icons.set_meal; // Représente un cochon stylisé
         break;
       case 'Poulet de chair':
-        iconData = Icons.egg_alt; // Poulet/Œuf
+        iconData = Icons.egg_alt; // Représente un poulet ou un œuf
         break;
       default:
         iconData = Icons.pets;
     }
-    
+
     return Icon(
       iconData,
       size: 48,
@@ -202,4 +216,3 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
     );
   }
 }
-

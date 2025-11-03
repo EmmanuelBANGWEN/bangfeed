@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/local_db_service.dart';
-// import 'dashboard_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,42 +11,14 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // ✅ FirebaseAuth nullable pour mode offline
-  
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // ✅ Vérifier le mode offline
-    final isOffline = Provider.of<bool>(context, listen: false);
-    
-    if (isOffline) {
-      // ✅ Rediriger immédiatement si en mode offline
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Inscription impossible en mode hors ligne'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-          Navigator.pop(context);
-        }
-      });
-    } else {
-      try {
-      } catch (e) {
-        print('⚠️ [REGISTER] FirebaseAuth non disponible: $e');
-      }
-    }
-  }
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
 
   void _register() async {
-    // Validation des mots de passe
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -59,7 +29,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Validation longueur mot de passe
     if (_passwordController.text.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -71,20 +40,17 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     setState(() => _isLoading = true);
-
     try {
       final localDb = Provider.of<LocalDbService>(context, listen: false);
       final isOffline = Provider.of<bool>(context, listen: false);
-      
+
       if (isOffline) {
         throw Exception('Inscription impossible en mode hors ligne');
       }
 
       final authService = AuthService(localDb, isOfflineMode: false);
-
-      // ✅ Utiliser AuthService pour l'inscription
-      await authService.signUp(
-        _emailController.text.trim(),
+      await authService.signUpWithPhone(
+        _phoneController.text.trim(),
         _passwordController.text.trim(),
       );
 
@@ -95,31 +61,24 @@ class _RegisterPageState extends State<RegisterPage> {
             backgroundColor: Colors.green,
           ),
         );
-        
-        // ✅ AuthWrapper gère la navigation automatiquement
-        // Retour à LoginPage qui redirigera vers Dashboard
         Navigator.pop(context);
       }
-      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur d\'inscription: ${e.toString().replaceAll("Exception: ", "")}'),
+            content: Text(e.toString().replaceAll("Exception: ", "")),
             backgroundColor: Colors.red,
           ),
         );
       }
     }
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
+    if (mounted) setState(() => _isLoading = false);
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -130,91 +89,220 @@ class _RegisterPageState extends State<RegisterPage> {
     final isOffline = Provider.of<bool>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inscription'),
-        actions: [
-          // ✅ Indicateur de statut
-          if (isOffline)
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Center(
-                child: Row(
-                  children: [
-                    Icon(Icons.cloud_off, size: 20, color: Colors.orange[300]),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Hors ligne',
-                      style: TextStyle(fontSize: 14),
+      backgroundColor: const Color(0xFFFFF6E8),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 40),
+
+              // Logo et titre
+              Column(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD97706),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFD97706).withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.pets, color: Colors.white, size: 50),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Créer un compte',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4B2E2A),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Rejoignez BangFeed pour gérer votre élevage',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF4B2E2A),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 40),
+
+              // Formulaire
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-              ),
-            ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // ✅ Message d'avertissement si offline (ne devrait pas arriver)
-            if (isOffline)
-              Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  border: Border.all(color: Colors.red),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red[700]),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Inscription impossible en mode hors ligne',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
+                    TextField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Numéro de téléphone',
+                        prefixIcon: const Icon(Icons.phone, color: Color(0xFFD97706)),
+                        filled: true,
+                        fillColor: const Color(0xFFFFF6E8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
                         ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFFD97706), width: 2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Mot de passe
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      decoration: InputDecoration(
+                        labelText: 'Mot de passe',
+                        prefixIcon: const Icon(Icons.lock, color: Color(0xFFD97706)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            color: const Color(0xFFD97706),
+                          ),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFFFF6E8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFFD97706), width: 2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Confirmation
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirm,
+                      decoration: InputDecoration(
+                        labelText: 'Confirmer le mot de passe',
+                        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFD97706)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                            color: const Color(0xFFD97706),
+                          ),
+                          onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFFFF6E8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFFD97706), width: 2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Bouton inscription
+                    SizedBox(
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: isOffline ? null : _register,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD97706),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              )
+                            : const Text(
+                                'S\'inscrire',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ],
                 ),
               ),
 
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-              enabled: !isOffline,
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Mot de passe'),
-              obscureText: true,
-              enabled: !isOffline,
-            ),
-            TextField(
-              controller: _confirmPasswordController,
-              decoration: const InputDecoration(labelText: 'Confirmer mot de passe'),
-              obscureText: true,
-              enabled: !isOffline,
-            ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: isOffline ? null : _register,
-                    child: const Text('S\'inscrire'),
+              const SizedBox(height: 24),
+
+              // Lien vers Login
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Déjà un compte ? ',
+                    style: TextStyle(
+                      color: const Color(0xFF4B2E2A).withOpacity(0.7),
+                    ),
                   ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Déjà un compte ? Se connecter'),
-            ),
-          ],
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Se connecter',
+                      style: TextStyle(
+                        color: Color(0xFFD97706),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              if (isOffline)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Inscription disponible uniquement en ligne',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: const Color(0xFF4B2E2A).withOpacity(0.6),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

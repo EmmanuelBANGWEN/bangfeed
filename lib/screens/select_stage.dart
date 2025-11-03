@@ -23,7 +23,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFFF6E8),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -36,7 +36,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B4332),
+                  color: Color(0xFF4B2E2A),
                 ),
               ),
               
@@ -48,7 +48,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Color(0xFF4B2E2A),
                   height: 1.3,
                 ),
               ),
@@ -79,24 +79,29 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected 
-                                  ? const Color(0xFF2D5F4F) 
-                                  : Colors.grey[300]!,
-                              width: isSelected ? 2.5 : 1.5,
-                            ),
+                            
+                            
+                        border: Border.all(
+  color: isSelected 
+      ? const Color(0xFFD97706) // ✅ Orange au lieu de vert
+      : Colors.grey[300]!,
+  width: isSelected ? 2.5 : 1.5,
+),
+
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.03),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
-                              if (isSelected)
-                                BoxShadow(
-                                  color: const Color(0xFF2D5F4F).withOpacity(0.15),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
+                              
+                           if (isSelected)
+  BoxShadow(
+    color: const Color(0xFFD97706).withOpacity(0.15),
+    blurRadius: 12,
+    offset: const Offset(0, 4),
+  ),
+
                             ],
                           ),
                           child: Row(
@@ -114,7 +119,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                                     width: 2,
                                   ),
                                   color: isSelected 
-                                      ? const Color(0xFF2D5F4F) 
+    ? const Color(0xFFD97706) // ✅ Orange
                                       : Colors.transparent,
                                 ),
                                 child: isSelected
@@ -138,7 +143,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                                         ? FontWeight.w600 
                                         : FontWeight.w500,
                                     color: isSelected 
-                                        ? const Color(0xFF1B4332) 
+                                        ? const Color(0xFF4B2E2A) 
                                         : Colors.black87,
                                   ),
                                 ),
@@ -175,7 +180,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[700],
+                          color: const Color(0xFF4B2E2A),
                         ),
                       ),
                     ),
@@ -200,7 +205,7 @@ class _StageSelectionPageState extends State<StageSelectionPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: selectedStage != null 
-                            ? const Color(0xFF2D5F4F) 
+                            ? const Color(0xFFD97706) 
                             : Colors.grey[300],
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 18),

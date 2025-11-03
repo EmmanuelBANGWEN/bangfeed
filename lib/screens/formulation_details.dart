@@ -91,17 +91,17 @@ Map<String, double> get nutritionalComposition {
     final nutrition = nutritionalComposition;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFFFF6E8),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFD97706),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFFD97706)),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            icon: const Icon(Icons.delete_outline, color: Color(0xFFD97706)),
             onPressed: () => _deleteFormulation(context),
           ),
         ],
@@ -118,7 +118,7 @@ Map<String, double> get nutritionalComposition {
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B4332),
+                  color: Color(0xFF4B2E2A),
                 ),
               ),
               
@@ -129,7 +129,7 @@ Map<String, double> get nutritionalComposition {
                 formulation.growthStage,
                 style: TextStyle(
                   fontSize: 20,
-                  color: Colors.grey[700],
+                  color: const Color(0xFF4B2E2A),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -158,7 +158,7 @@ Map<String, double> get nutritionalComposition {
                       'Coût total',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Colors.grey[700],
+                        color: const Color(0xFF4B2E2A),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -168,7 +168,7 @@ Map<String, double> get nutritionalComposition {
                       style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Color(0xFF4B2E2A),
                       ),
                     ),
                   ],
@@ -183,7 +183,7 @@ Map<String, double> get nutritionalComposition {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Color(0xFF4B2E2A),
                 ),
               ),
               
@@ -219,7 +219,7 @@ Map<String, double> get nutritionalComposition {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Color(0xFF4B2E2A),
                 ),
               ),
               
@@ -257,7 +257,7 @@ Map<String, double> get nutritionalComposition {
                                 ing.name,
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  color: Colors.black87,
+                                  color: Color(0xFF4B2E2A),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -268,7 +268,7 @@ Map<String, double> get nutritionalComposition {
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.grey[600],
+                                  color: const Color(0xFF4B2E2A),
                                 ),
                               ),
                             ),
@@ -277,7 +277,7 @@ Map<String, double> get nutritionalComposition {
                               '${ing.price.toStringAsFixed(2)} FCFA',
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black87,
+                                color: Color(0xFF4B2E2A),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -294,10 +294,13 @@ Map<String, double> get nutritionalComposition {
               // Bouton Supprimer
               SizedBox(
                 width: double.infinity,
+
+
+
                 child: ElevatedButton(
                   onPressed: () => _deleteFormulation(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[600],
+    backgroundColor: Colors.red[600], // ✅ Rouge pour supprimer (dangereux)
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
@@ -313,6 +316,9 @@ Map<String, double> get nutritionalComposition {
                     ),
                   ),
                 ),
+
+
+                
               ),
               
               const SizedBox(height: 24),
@@ -331,7 +337,7 @@ Map<String, double> get nutritionalComposition {
           label,
           style: const TextStyle(
             fontSize: 18,
-            color: Colors.black87,
+            color: Color(0xFF4B2E2A),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -340,7 +346,7 @@ Map<String, double> get nutritionalComposition {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Color(0xFF4B2E2A),
           ),
         ),
       ],

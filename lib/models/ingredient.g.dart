@@ -21,13 +21,18 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
       protein: fields[1] as double,
       energy: fields[2] as double,
       price: fields[3] as double,
+      quantity: fields[4] as double?,
+      calcium: fields[5] as double?,
+      phosphore: fields[6] as double?,
+      minIncl: fields[7] as double?,
+      maxIncl: fields[8] as double?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Ingredient obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -35,7 +40,17 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
       ..writeByte(2)
       ..write(obj.energy)
       ..writeByte(3)
-      ..write(obj.price);
+      ..write(obj.price)
+      ..writeByte(4)
+      ..write(obj.quantity)
+      ..writeByte(5)
+      ..write(obj.calcium)
+      ..writeByte(6)
+      ..write(obj.phosphore)
+      ..writeByte(7)
+      ..write(obj.minIncl)
+      ..writeByte(8)
+      ..write(obj.maxIncl);
   }
 
   @override
