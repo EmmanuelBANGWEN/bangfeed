@@ -31,10 +31,12 @@ Map<String, double> get nutritionalComposition {
 
   final proteinPercent = totalWeight > 0 ? (totalProtein / totalWeight) * 100 : 0.0; // ✅ Ajoutez .0
   final energyPercent = totalWeight > 0 ? (totalEnergy / totalWeight) * 100 : 0.0;   // ✅ Ajoutez .0
+  // final energyKcal = totalWeight > 0 ? (totalEnergy / totalWeight) : 0.0;
 
   return {
     'Protéines': proteinPercent.toDouble(),  // ✅ Convertir explicitement
     'Énergie': energyPercent.toDouble(),     // ✅ Convertir explicitement
+    // 'Énergie': energyKcal.toDouble(),     // ✅ Convertir explicitement
   };
 }
 
@@ -342,7 +344,14 @@ Map<String, double> get nutritionalComposition {
           ),
         ),
         Text(
-          '${percentage.toStringAsFixed(0)}%',
+          // '${percentage.toStringAsFixed(0)}%',
+          
+
+        label == 'Énergie'
+            ? '${percentage.toStringAsFixed(0)} kcal/kg'
+            : '${percentage.toStringAsFixed(0)}%',
+
+
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
