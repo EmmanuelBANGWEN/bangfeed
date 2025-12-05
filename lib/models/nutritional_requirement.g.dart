@@ -24,13 +24,17 @@ class NutritionalRequirementAdapter
       energy: fields[3] as double,
       calcium: fields[4] as double,
       phosphore: fields[5] as double,
+      lysine: fields[6] as double,
+      methionine: fields[7] as double,
+      fiber: fields[8] as double,
+      fat: fields[9] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, NutritionalRequirement obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.animal)
       ..writeByte(1)
@@ -42,7 +46,15 @@ class NutritionalRequirementAdapter
       ..writeByte(4)
       ..write(obj.calcium)
       ..writeByte(5)
-      ..write(obj.phosphore);
+      ..write(obj.phosphore)
+      ..writeByte(6)
+      ..write(obj.lysine)
+      ..writeByte(7)
+      ..write(obj.methionine)
+      ..writeByte(8)
+      ..write(obj.fiber)
+      ..writeByte(9)
+      ..write(obj.fat);
   }
 
   @override

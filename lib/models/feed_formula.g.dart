@@ -24,13 +24,17 @@ class FeedFormulaAdapter extends TypeAdapter<FeedFormula> {
       totalEnergy: fields[4] as double,
       totalCalcium: fields[5] as double,
       totalPhosphore: fields[6] as double,
+      totalLysine: fields[7] as double,
+      totalMethionine: fields[8] as double,
+      totalFiber: fields[9] as double,
+      totalFat: fields[10] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, FeedFormula obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.animal)
       ..writeByte(1)
@@ -44,7 +48,15 @@ class FeedFormulaAdapter extends TypeAdapter<FeedFormula> {
       ..writeByte(5)
       ..write(obj.totalCalcium)
       ..writeByte(6)
-      ..write(obj.totalPhosphore);
+      ..write(obj.totalPhosphore)
+      ..writeByte(7)
+      ..write(obj.totalLysine)
+      ..writeByte(8)
+      ..write(obj.totalMethionine)
+      ..writeByte(9)
+      ..write(obj.totalFiber)
+      ..writeByte(10)
+      ..write(obj.totalFat);
   }
 
   @override

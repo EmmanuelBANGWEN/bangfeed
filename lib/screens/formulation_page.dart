@@ -35,85 +35,147 @@ class _FormulationPageState extends State<FormulationPage> {
     super.dispose();
   }
 
-  void _autoFormulate() {
-    final requirement = NutritionalRequirementsData.getRequirement(
-      widget.animal,
-      widget.stage,
+
+
+
+// Remplace ta méthode _autoFormulate() par celle-ci pour diagnostiquer
+
+void _autoFormulate() {
+  // 🔍 DIAGNOSTIC 1 : Vérifie les valeurs reçues
+  print('🐾 Animal reçu: "${widget.animal}"');
+  print('📊 Stage reçu: "${widget.stage}"');
+  
+  final requirement = NutritionalRequirementsData.getRequirement(
+    widget.animal,
+    widget.stage,
+  );
+
+  // 🔍 DIAGNOSTIC 2 : Vérifie le résultat
+  print('📋 Requirement trouvé: ${requirement != null ? "OUI" : "NON"}');
+  
+  if (requirement == null) {
+    // 🔍 DIAGNOSTIC 3 : Liste toutes les combinaisons disponibles
+    print('⚠️ ERREUR: Aucune correspondance trouvée!');
+    print('📚 Vérifie dans ta classe NutritionalRequirementsData:');
+    print('   - Les noms d\'animaux exacts');
+    print('   - Les noms de stages exacts');
+    print('   - La casse (majuscules/minuscules)');
+    print('   - Les espaces avant/après');
+    
+    _showSnack(
+      'Aucun besoin défini pour "${ widget.animal}" au stade "${widget.stage}".\nVérifie la console.',
+      Colors.red,
     );
-
-    if (requirement == null) {
-      _showSnack('Aucun besoin défini pour ce stade.', Colors.red);
-      return;
-    }
-
-    if (_selectedIngredients.isEmpty) {
-      _showSnack('Veuillez sélectionner au moins un ingrédient.', Colors.orange);
-      return;
-    }
-
-    // ✅ Validation des contraintes min/max
-    double totalMin = _selectedIngredients.fold(
-      0.0,
-      (sum, ing) => sum + (ing.minIncl ?? 0),
-    );
-
-    if (totalMin > 1.0) {
-      _showSnack(
-        'Les minimums totalisent ${(totalMin * 100).toStringAsFixed(1)}% (max 100%)',
-        Colors.red,
-      );
-      return;
-    }
-
-    // ✅ Préparer les ingrédients avec prix actualisés
-    final ingredientsToFormulate = _selectedIngredients.map((ing) {
-      final controller = _priceControllers[ing.name];
-      final updatedPrice = double.tryParse(
-            controller?.text.replaceAll(',', '.') ?? '',
-          ) ??
-          ing.price;
-
-      return Ingredient(
-        name: ing.name,
-        protein: ing.protein,
-        energy: ing.energy,
-        calcium: ing.calcium,
-        phosphore: ing.phosphore,
-        price: updatedPrice,
-        quantity: null,
-        minIncl: ing.minIncl,
-        maxIncl: ing.maxIncl,
-      );
-    }).toList();
-
-    // ✅ Lancer la formulation
-    try {
-      final result = FeedFormulationService().formulate(
-        requirement: requirement,
-        availableIngredients: ingredientsToFormulate,
-      );
-
-      double totalCost = result.ingredients.fold(
-        0.0,
-        (sum, ing) => sum + ((ing.quantity ?? 0) * 100 * ing.price),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResultPage(
-            animal: widget.animal,
-            stage: widget.stage,
-            ingredients: result.ingredients,
-            totalCost: totalCost,
-            requirement: requirement,
-          ),
-        ),
-      );
-    } catch (e) {
-      _showSnack('Erreur de formulation : $e', Colors.red);
-    }
+    return;
   }
+
+  if (_selectedIngredients.isEmpty) {
+    _showSnack('Veuillez sélectionner au moins un ingrédient.', Colors.orange);
+    return;
+  }
+
+  // ✅ Validation des contraintes min/max
+  double totalMin = _selectedIngredients.fold(
+    0.0,
+    (sum, ing) => sum + (ing.minIncl ?? 0),
+  );
+
+  if (totalMin > 1.0) {
+    _showSnack(
+      'Les minimums totalisent ${(totalMin * 100).toStringAsFixed(1)}% (max 100%)',
+      Colors.red,
+    );
+    return;
+  }
+
+  // ✅ Préparer les ingrédients avec prix actualisés
+  final ingredientsToFormulate = _selectedIngredients.map((ing) {
+    final controller = _priceControllers[ing.name];
+    final updatedPrice = double.tryParse(
+          controller?.text.replaceAll(',', '.') ?? '',
+        ) ??
+        ing.price;
+
+    return Ingredient(
+      name: ing.name,
+      protein: ing.protein,
+      energy: ing.energy,
+      calcium: ing.calcium,
+      phosphore: ing.phosphore,
+      price: updatedPrice,
+      quantity: null,
+      minIncl: ing.minIncl,
+      maxIncl: ing.maxIncl,
+      lysine: ing.lysine,
+      methionine: ing.methionine,
+      fiber: ing.fiber,
+      fat: ing.fat,
+    );
+  }).toList();
+
+  // ✅ Lancer la formulation
+  try {
+    final result = FeedFormulationService().formulate(
+      requirement: requirement,
+      availableIngredients: ingredientsToFormulate,
+    );
+
+    double totalCost = result.ingredients.fold(
+      0.0,
+      (sum, ing) => sum + ((ing.quantity ?? 0) * 100 * ing.price),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ResultPage(
+          animal: widget.animal,
+          stage: widget.stage,
+          ingredients: result.ingredients,
+          totalCost: totalCost,
+          requirement: requirement,
+        ),
+      ),
+    );
+  } catch (e) {
+    print('❌ Erreur formulation: $e');
+    _showSnack('Erreur de formulation : $e', Colors.red);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -359,16 +421,24 @@ class _FormulationPageState extends State<FormulationPage> {
                             ),
 
                           const SizedBox(height: 8),
-
+                 
+                 
+                 
+                 
                           // 📊 Valeurs nutritionnelles
                           Text(
                             'Protéines : ${ing.protein}% | Énergie : ${ing.energy} kcal/kg\n'
-                            'Calcium : ${ing.calcium}% | Phosphore : ${ing.phosphore}%',
+                            'Calcium : ${ing.calcium}% | Phosphore : ${ing.phosphore}%\n'
+                            'Lysine : ${ing.lysine}% | Méthionine : ${ing.methionine}%\n'
+                            'Fibres : ${ing.fiber}% | Matières grasses : ${ing.fat}%',
                             style: const TextStyle(
                               fontSize: 13,
                               color: Color(0xFF4B2E2A),
                             ),
                           ),
+
+
+                          
                           const SizedBox(height: 10),
 
                           // 💰 Champ prix
@@ -429,7 +499,6 @@ class _FormulationPageState extends State<FormulationPage> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
-
 
 
 

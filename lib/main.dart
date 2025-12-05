@@ -1,3 +1,5 @@
+import 'package:bangfeed/screens/payer.dart';
+import 'package:bangfeed/screens/payer_test.dart';
 import 'package:bangfeed/services/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ import 'services/firestore_service.dart';
 import 'providers/formulation_provider.dart';
 import 'providers/ingredient_provider.dart';
 import 'screens/login_page.dart';
-import 'screens/dashboard_page.dart';
+import 'screens/home/dashboard_page.dart';
 import 'models/ingredient.dart';
 import 'models/formulation.dart';
 
@@ -123,6 +125,11 @@ class MyApp extends StatelessWidget {
       ),
       home: AuthWrapper(isOfflineMode: isOfflineMode),
       
+  routes: {
+    // '/pay': (context) => const PayPage(),
+    '/pay': (context) => const TestPaymentPage(),
+  },
+
     );
   }
 }

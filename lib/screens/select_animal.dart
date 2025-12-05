@@ -1,3 +1,5 @@
+import 'package:bangfeed/screens/select_age_page/pondeuse_age_page.dart';
+import 'package:bangfeed/screens/select_age_page/silure_age_page.dart';
 import 'package:flutter/material.dart';
 
 // ✅ Tes pages cibles (vérifie bien les noms de classes internes)
@@ -25,6 +27,20 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
       'icon': '🐔',
       'color': const Color(0xFFD97706),
     },
+
+    {
+      'name': 'Poule pondeuse',
+      'icon': '🥚',
+      'color': Color(0xFFD97706),
+    },
+    {
+      'name': 'Poisson silure',
+      'icon': '🐟',
+      'color': Color(0xFFD97706),
+    },
+
+
+
   ];
 
   @override
@@ -149,24 +165,49 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
                   onPressed: selectedAnimal == null
                       ? null
                       : () {
-                          Widget nextPage;
+                          late Widget nextPage;
 
-                          switch (selectedAnimal) {
-                            case 'Porc':
-                              nextPage = const StagePorcPage(); // ✅ Vérifie le nom
-                              break;
-                            case 'Poulet de chair':
-                              nextPage = const StagePouletPage(); // ✅ Vérifie le nom
-                              break;
-                            default:
-                              nextPage = const Placeholder();
-                          }
+                          // switch (selectedAnimal) {
+                          //   case 'Porc':
+                          //     nextPage = const StagePorcPage(); // ✅ Vérifie le nom
+                          //     break;
+                          //   case 'Poulet de chair':
+                          //     nextPage = const StagePouletPage(); // ✅ Vérifie le nom
+                          //     break;
+                          //   default:
+                          //     nextPage = const Placeholder();
+                          // }
+
+
+                            switch (selectedAnimal) {
+                              case 'Porc':
+                                nextPage = const StagePorcPage();
+                                break;
+                              case 'Poulet de chair':
+                                nextPage = const StagePouletPage();
+                                break;
+
+                              // ➕ AJOUTE ICI :
+                              case 'Poule pondeuse':
+                                nextPage = const StagePoulePondeusePage();
+                                break;
+                              case 'Poisson silure':
+                                nextPage = const StagePoissonSilurePage();
+                                break;
+                            }
+
+
+
+
 
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => nextPage),
                           );
                         },
+
+
+                        
                   style: ElevatedButton.styleFrom(
                     backgroundColor: selectedAnimal != null
                         ? const Color(0xFFD97706)
@@ -200,11 +241,21 @@ class _AnimalSelectionPageState extends State<AnimalSelectionPage> {
 
     switch (animalName) {
       case 'Porc':
-        iconData = Icons.set_meal; // Représente un cochon stylisé
+        iconData = Icons.pets; // Représente un cochon stylisé
         break;
       case 'Poulet de chair':
         iconData = Icons.egg_alt; // Représente un poulet ou un œuf
         break;
+
+      case 'Poule pondeuse':
+        iconData = Icons.egg; // Représente un poulet ou un œuf
+        break;
+
+      case 'Poisson silure':
+        iconData = Icons.set_meal; // Représente un poulet ou un œuf
+        break;
+
+
       default:
         iconData = Icons.pets;
     }

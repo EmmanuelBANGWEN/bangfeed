@@ -1,4 +1,4 @@
-import 'package:bangfeed/screens/dashboard_page.dart';
+import 'package:bangfeed/screens/home/dashboard_page.dart';
 import 'package:bangfeed/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

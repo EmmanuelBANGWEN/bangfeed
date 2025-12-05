@@ -10,11 +10,13 @@ import '../models/feed_formula.dart';
 /// Priorité 2: Autres nutriments (calcium, phosphore, etc.)
 class FlutterFormulationService {
   
+
   /// Nutriments prioritaires (contraintes critiques)
   static const List<String> priorityNutrients = ['protein', 'energy'];
   
   /// Nutriments secondaires
-  static const List<String> secondaryNutrients = ['calcium', 'phosphore'];
+  // static const List<String> secondaryNutrients = ['calcium', 'phosphore'];
+  static const List<String> secondaryNutrients = ['calcium', 'phosphore', 'lysine', 'methionine', 'fiber', 'fat']; // ✅ MODIFIÉ
 
   /// ✅ COMPTEUR POUR ÉVITER LES BOUCLES INFINIES
   int _relaxationAttempts = 0;
@@ -375,35 +377,87 @@ class FlutterFormulationService {
   }
 
   /// Calcule la valeur d'un nutriment
-  double _calculateNutrient(
-    Map<String, double> mix,
-    List<Ingredient> ingredients,
-    String nutrient,
-  ) {
-    double total = 0.0;
-    for (var ing in ingredients) {
-      double proportion = mix[ing.name] ?? 0.0;
-      double? value = 0.0;
+  // double _calculateNutrient(
+  //   Map<String, double> mix,
+  //   List<Ingredient> ingredients,
+  //   String nutrient,
+  // ) {
+  //   double total = 0.0;
+  //   for (var ing in ingredients) {
+  //     double proportion = mix[ing.name] ?? 0.0;
+  //     double? value = 0.0;
 
-      switch (nutrient) {
-        case 'protein':
-          value = ing.protein;
-          break;
-        case 'energy':
-          value = ing.energy;
-          break;
-        case 'calcium':
-          value = ing.calcium;
-          break;
-        case 'phosphore':
-          value = ing.phosphore;
-          break;
-      }
+  //     switch (nutrient) {
+  //       case 'protein':
+  //         value = ing.protein;
+  //         break;
+  //       case 'energy':
+  //         value = ing.energy;
+  //         break;
+  //       case 'calcium':
+  //         value = ing.calcium;
+  //         break;
+  //       case 'phosphore':
+  //         value = ing.phosphore;
+  //         break;
+  //     }
 
-      total += proportion * value!;
+  //     total += proportion * value!;
+  //   }
+  //   return total;
+  // }
+
+
+
+
+
+
+
+
+/// Calcule la valeur d'un nutriment
+double _calculateNutrient(
+  Map<String, double> mix,
+  List<Ingredient> ingredients,
+  String nutrient,
+) {
+  double total = 0.0;
+  for (var ing in ingredients) {
+    double proportion = mix[ing.name] ?? 0.0;
+    double? value = 0.0;
+
+    switch (nutrient) {
+      case 'protein':
+        value = ing.protein;
+        break;
+      case 'energy':
+        value = ing.energy;
+        break;
+      case 'calcium':
+        value = ing.calcium;
+        break;
+      case 'phosphore':
+        value = ing.phosphore;
+        break;
+      case 'lysine':        // ✅ AJOUT
+        value = ing.lysine;
+        break;
+      case 'methionine':    // ✅ AJOUT
+        value = ing.methionine;
+        break;
+      case 'fiber':         // ✅ AJOUT
+        value = ing.fiber;
+        break;
+      case 'fat':           // ✅ AJOUT
+        value = ing.fat;
+        break;
     }
-    return total;
+
+    total += proportion * (value ?? 0.0); // ✅ Gérer les nullables
   }
+  return total;
+}
+
+
 
   /// Normalise le mix pour que la somme = 1
   Map<String, double> _normalizeMix(Map<String, double> mix) {
@@ -417,52 +471,142 @@ class FlutterFormulationService {
     return normalized;
   }
 
-  /// Construit le résultat final
-  FeedFormula _buildResult(
-    Map<String, double> mix,
-    NutritionalRequirement requirement,
-    List<Ingredient> ingredients,
-  ) {
-    List<Ingredient> formulatedIngredients = [];
+
+
+
+
+
+
+
+
+
+
+  // /// Construit le résultat final
+  // FeedFormula _buildResult(
+  //   Map<String, double> mix,
+  //   NutritionalRequirement requirement,
+  //   List<Ingredient> ingredients,
+  // ) {
+  //   List<Ingredient> formulatedIngredients = [];
     
-    for (var entry in mix.entries) {
-      if (entry.value < 0.001) continue; // Ignorer quantités négligeables
+  //   for (var entry in mix.entries) {
+  //     if (entry.value < 0.001) continue; // Ignorer quantités négligeables
       
-      var originalIng = ingredients.firstWhere((ing) => ing.name == entry.key);
-      formulatedIngredients.add(
-        Ingredient(
-          name: originalIng.name,
-          protein: originalIng.protein,
-          energy: originalIng.energy,
-          calcium: originalIng.calcium,
-          phosphore: originalIng.phosphore,
-          price: originalIng.price,
-          quantity: entry.value,
-          minIncl: originalIng.minIncl,
-          maxIncl: originalIng.maxIncl,
-        ),
-      );
-    }
+  //     var originalIng = ingredients.firstWhere((ing) => ing.name == entry.key);
+  //     formulatedIngredients.add(
+  //       Ingredient(
+  //         name: originalIng.name,
+  //         protein: originalIng.protein,
+  //         energy: originalIng.energy,
+  //         calcium: originalIng.calcium,
+  //         phosphore: originalIng.phosphore,
+  //         price: originalIng.price,
+  //         quantity: entry.value,
+  //         minIncl: originalIng.minIncl,
+  //         maxIncl: originalIng.maxIncl,
+  //       ),
+  //     );
+  //   }
 
-    double totalProtein = _calculateNutrient(mix, ingredients, 'protein');
-    double totalEnergy = _calculateNutrient(mix, ingredients, 'energy');
-    double totalCalcium = _calculateNutrient(mix, ingredients, 'calcium');
-    double totalPhosphore = _calculateNutrient(mix, ingredients, 'phosphore');
+  //   double totalProtein = _calculateNutrient(mix, ingredients, 'protein');
+  //   double totalEnergy = _calculateNutrient(mix, ingredients, 'energy');
+  //   double totalCalcium = _calculateNutrient(mix, ingredients, 'calcium');
+  //   double totalPhosphore = _calculateNutrient(mix, ingredients, 'phosphore');
 
-    print('\n📊 RÉSULTATS FINAUX:');
-    print('  Protéines: ${totalProtein.toStringAsFixed(1)}% (requis: ${requirement.protein}%)');
-    print('  Énergie: ${totalEnergy.toStringAsFixed(0)} (requis: ${requirement.energy})');
-    print('  Calcium: ${totalCalcium.toStringAsFixed(2)}% (requis: ${requirement.calcium}%)');
-    print('  Phosphore: ${totalPhosphore.toStringAsFixed(2)}% (requis: ${requirement.phosphore}%)');
+  //   print('\n📊 RÉSULTATS FINAUX:');
+  //   print('  Protéines: ${totalProtein.toStringAsFixed(1)}% (requis: ${requirement.protein}%)');
+  //   print('  Énergie: ${totalEnergy.toStringAsFixed(0)} (requis: ${requirement.energy})');
+  //   print('  Calcium: ${totalCalcium.toStringAsFixed(2)}% (requis: ${requirement.calcium}%)');
+  //   print('  Phosphore: ${totalPhosphore.toStringAsFixed(2)}% (requis: ${requirement.phosphore}%)');
 
-    return FeedFormula(
-      animal: requirement.animal,
-      stage: requirement.stage,
-      ingredients: formulatedIngredients,
-      totalProtein: totalProtein,
-      totalEnergy: totalEnergy,
-      totalCalcium: totalCalcium,
-      totalPhosphore: totalPhosphore,
+  //   return FeedFormula(
+  //     animal: requirement.animal,
+  //     stage: requirement.stage,
+  //     ingredients: formulatedIngredients,
+  //     totalProtein: totalProtein,
+  //     totalEnergy: totalEnergy,
+  //     totalCalcium: totalCalcium,
+  //     totalPhosphore: totalPhosphore,
+  //   );
+  // }
+
+
+
+
+
+
+/// Construit le résultat final
+FeedFormula _buildResult(
+  Map<String, double> mix,
+  NutritionalRequirement requirement,
+  List<Ingredient> ingredients,
+) {
+  List<Ingredient> formulatedIngredients = [];
+  
+  for (var entry in mix.entries) {
+    if (entry.value < 0.001) continue;
+    
+    var originalIng = ingredients.firstWhere((ing) => ing.name == entry.key);
+    formulatedIngredients.add(
+      Ingredient(
+        name: originalIng.name,
+        protein: originalIng.protein,
+        energy: originalIng.energy,
+        calcium: originalIng.calcium,
+        phosphore: originalIng.phosphore,
+        price: originalIng.price,
+        quantity: entry.value,
+        minIncl: originalIng.minIncl,
+        maxIncl: originalIng.maxIncl,
+        lysine: originalIng.lysine,           // ✅ AJOUT
+        methionine: originalIng.methionine,   // ✅ AJOUT
+        fiber: originalIng.fiber,             // ✅ AJOUT
+        fat: originalIng.fat,                 // ✅ AJOUT
+      ),
     );
   }
+
+  double totalProtein = _calculateNutrient(mix, ingredients, 'protein');
+  double totalEnergy = _calculateNutrient(mix, ingredients, 'energy');
+  double totalCalcium = _calculateNutrient(mix, ingredients, 'calcium');
+  double totalPhosphore = _calculateNutrient(mix, ingredients, 'phosphore');
+  double totalLysine = _calculateNutrient(mix, ingredients, 'lysine');         // ✅ AJOUT
+  double totalMethionine = _calculateNutrient(mix, ingredients, 'methionine'); // ✅ AJOUT
+  double totalFiber = _calculateNutrient(mix, ingredients, 'fiber');           // ✅ AJOUT
+  double totalFat = _calculateNutrient(mix, ingredients, 'fat');               // ✅ AJOUT
+
+  print('\n📊 RÉSULTATS FINAUX:');
+  print('  Protéines: ${totalProtein.toStringAsFixed(1)}% (requis: ${requirement.protein}%)');
+  print('  Énergie: ${totalEnergy.toStringAsFixed(0)} (requis: ${requirement.energy})');
+  print('  Calcium: ${totalCalcium.toStringAsFixed(2)}% (requis: ${requirement.calcium}%)');
+  print('  Phosphore: ${totalPhosphore.toStringAsFixed(2)}% (requis: ${requirement.phosphore}%)');
+  print('  Lysine: ${totalLysine.toStringAsFixed(2)}% (requis: ${requirement.lysine}%)');           // ✅ AJOUT
+  print('  Méthionine: ${totalMethionine.toStringAsFixed(2)}% (requis: ${requirement.methionine}%)'); // ✅ AJOUT
+  print('  Fibres: ${totalFiber.toStringAsFixed(2)}% (requis: ${requirement.fiber}%)');             // ✅ AJOUT
+  print('  Matières grasses: ${totalFat.toStringAsFixed(2)}% (requis: ${requirement.fat}%)');      // ✅ AJOUT
+
+  return FeedFormula(
+    animal: requirement.animal,
+    stage: requirement.stage,
+    ingredients: formulatedIngredients,
+    totalProtein: totalProtein,
+    totalEnergy: totalEnergy,
+    totalCalcium: totalCalcium,
+    totalPhosphore: totalPhosphore,
+    totalLysine: totalLysine,           // ✅ AJOUT
+    totalMethionine: totalMethionine,   // ✅ AJOUT
+    totalFiber: totalFiber,             // ✅ AJOUT
+    totalFat: totalFat,                 // ✅ AJOUT
+  );
+}
+
+
+
+
+
+
+
+
+
+
 }

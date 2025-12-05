@@ -1,3 +1,7 @@
+import 'package:bangfeed/screens/payer.dart';
+import 'package:bangfeed/screens/payer_test.dart';
+import 'package:bangfeed/services/firestore_service.dart';
+import 'package:bangfeed/services/premium_service.dart';
 import 'package:flutter/material.dart';
 import '../models/ingredient.dart';
 import '../models/formulation.dart';
@@ -8,12 +12,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/notification_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class ResultPage extends StatelessWidget {
+class ResultPage extends StatefulWidget {
   final String animal;
   final String stage;
   final List<Ingredient> ingredients;
   final double totalCost;
-  final NutritionalRequirement? requirement; // ✅ NOUVEAU
+  final NutritionalRequirement? requirement;
 
   const ResultPage({
     super.key,
@@ -21,14 +25,89 @@ class ResultPage extends StatelessWidget {
     required this.stage,
     required this.ingredients,
     required this.totalCost,
-    this.requirement, // ✅ NOUVEAU
+    this.requirement,
   });
 
-  // ✅ Quantité totale (les proportions somment à 1, donc multiplier par 100 pour avoir 100kg)
+  @override
+  State<ResultPage> createState() => _ResultPageState();
+}
+
+class _ResultPageState extends State<ResultPage> {
+  bool _isPremium = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPremiumStatus();
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+Future<void> _checkPremiumStatus() async {
+  try {
+    final isPremium = await PremiumService().checkPremiumStatus();
+    setState(() {
+      _isPremium = isPremium;
+      _isLoading = false;
+    });
+    
+    print("✅ PREMIUM STATUS dans ResultPage: $_isPremium");
+  } catch (e) {
+    print('❌ Erreur checkPremium: $e');
+    setState(() {
+      _isPremium = false;
+      _isLoading = false;
+    });
+  }
+}
+
+
+
+
+
+  // Future<void> _checkPremiumStatus() async {
+  //   try {
+  //     final user = FirebaseAuth.instance.currentUser;
+  //     if (user == null) {
+  //       setState(() {
+  //         _isPremium = false;
+  //         _isLoading = false;
+  //       });
+  //       return;
+  //     }
+
+  //     final data = await FirestoreService().getUserData(user.uid);
+  //     setState(() {
+  //       _isPremium = data?['isPremium'] ?? false;
+  //       _isLoading = false;
+  //     });
+      
+  //     print("✅ PREMIUM STATUS dans ResultPage: $_isPremium");
+  //   } catch (e) {
+  //     print('❌ Erreur checkPremium: $e');
+  //     setState(() {
+  //       _isPremium = false;
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  // ✅ Quantité totale
   double get totalWeight => 100.0;
 
   // ✅ Coût par kg
-  double get costPerKg => totalCost / totalWeight;
+  double get costPerKg => widget.totalCost / totalWeight;
 
   // ✅ Composition nutritionnelle pondérée
   Map<String, double> get nutritionalComposition {
@@ -37,7 +116,7 @@ class ResultPage extends StatelessWidget {
     double totalCalcium = 0;
     double totalPhosphore = 0;
 
-    for (var ing in ingredients) {
+    for (var ing in widget.ingredients) {
       final proportion = ing.quantity ?? 0;
       totalProtein += ing.protein * proportion;
       totalEnergy += ing.energy * proportion;
@@ -53,75 +132,102 @@ class ResultPage extends StatelessWidget {
     };
   }
 
-  // ✅ NOUVEAU: Validation de la formule
-  Map<String, dynamic> validateFormula() {
-    if (requirement == null) {
-      return {
-        'isValid': false,
-        'message': 'Pas de référence nutritionnelle',
-        'details': {},
-      };
-    }
 
-    final composition = nutritionalComposition;
-    const double tolerance = 0.10; // 10% de tolérance
 
-    bool proteinOk = _isInRange(
-      composition['Protéines']!,
-      requirement!.protein,
-      tolerance,
-    );
-    bool energyOk = _isInRange(
-      composition['Énergie']!,
-      requirement!.energy,
-      tolerance,
-    );
-    bool calciumOk = _isInRange(
-      composition['Calcium']!,
-      requirement!.calcium,
-      tolerance,
-    );
-    bool phosphoreOk = _isInRange(
-      composition['Phosphore']!,
-      requirement!.phosphore,
-      tolerance,
-    );
 
-    bool isValid = proteinOk && energyOk && calciumOk && phosphoreOk;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ✅ NOUVEAU: Validation de la formule
+Map<String, dynamic> validateFormula() {
+  if (widget.requirement == null) {
     return {
-      'isValid': isValid,
-      'protein': proteinOk,
-      'energy': energyOk,
-      'calcium': calciumOk,
-      'phosphore': phosphoreOk,
-      'message': isValid 
-          ? '✅ Formule conforme aux besoins nutritionnels'
-          : '⚠️ Formule à ajuster',
-      'details': {
-        'Protéines': {
-          'actual': composition['Protéines']!,
-          'required': requirement!.protein,
-          'status': proteinOk,
-        },
-        'Énergie': {
-          'actual': composition['Énergie']!,
-          'required': requirement!.energy,
-          'status': energyOk,
-        },
-        'Calcium': {
-          'actual': composition['Calcium']!,
-          'required': requirement!.calcium,
-          'status': calciumOk,
-        },
-        'Phosphore': {
-          'actual': composition['Phosphore']!,
-          'required': requirement!.phosphore,
-          'status': phosphoreOk,
-        },
-      },
+      'isValid': false,
+      'message': 'Pas de référence nutritionnelle',
+      'details': {},
     };
   }
+
+  final composition = nutritionalComposition;
+  const double tolerance = 0.10; // 10% de tolérance
+
+  bool proteinOk = _isInRange(
+    composition['Protéines']!,
+    widget.requirement!.protein,
+    tolerance,
+  );
+  bool energyOk = _isInRange(
+    composition['Énergie']!,
+    widget.requirement!.energy,
+    tolerance,
+  );
+  bool calciumOk = _isInRange(
+    composition['Calcium']!,
+    widget.requirement!.calcium,
+    tolerance,
+  );
+  bool phosphoreOk = _isInRange(
+    composition['Phosphore']!,
+    widget.requirement!.phosphore,
+    tolerance,
+  );
+
+  bool isValid = proteinOk && energyOk && calciumOk && phosphoreOk;
+
+  return {
+    'isValid': isValid,
+    'protein': proteinOk,
+    'energy': energyOk,
+    'calcium': calciumOk,
+    'phosphore': phosphoreOk,
+    'message': isValid 
+        ? '✅ Formule conforme aux besoins nutritionnels'
+        : '⚠️ Formule à ajuster',
+    'details': {
+      'Protéines': {
+        'actual': composition['Protéines']!,
+        'required': widget.requirement!.protein,
+        'status': proteinOk,
+      },
+      'Énergie': {
+        'actual': composition['Énergie']!,
+        'required': widget.requirement!.energy,
+        'status': energyOk,
+      },
+      'Calcium': {
+        'actual': composition['Calcium']!,
+        'required': widget.requirement!.calcium,
+        'status': calciumOk,
+      },
+      'Phosphore': {
+        'actual': composition['Phosphore']!,
+        'required': widget.requirement!.phosphore,
+        'status': phosphoreOk,
+      },
+    },
+  };
+}
 
   bool _isInRange(double actual, double required, double tolerance) {
     double lowerBound = required * (1 - tolerance);
@@ -129,57 +235,64 @@ class ResultPage extends StatelessWidget {
     return actual >= lowerBound && actual <= upperBound;
   }
 
-  void _save(BuildContext context) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+void _save(BuildContext context) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  try {
+    final formulation = Formulation(
+      userId: user.uid,
+      animalType: widget.animal,      // ✅ widget.animal
+      growthStage: widget.stage,       // ✅ widget.stage
+      ingredients: widget.ingredients, // ✅ widget.ingredients
+      totalCost: widget.totalCost,     // ✅ widget.totalCost
+      date: DateTime.now(),
+    );
+
+    await context.read<FormulationProvider>().addFormulation(formulation);
+
+    await NotificationService.sendLocalNotification(
+      title: '✅ Formulation sauvegardée',
+      body: '${widget.animal} (${widget.stage}) - ${widget.totalCost.toStringAsFixed(0)} FCFA',
+    );
+
+    Navigator.of(context).pop();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Formulation sauvegardée avec succès'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
       ),
     );
 
-    try {
-      final formulation = Formulation(
-        userId: user.uid,
-        animalType: animal,
-        growthStage: stage,
-        ingredients: ingredients,
-        totalCost: totalCost,
-        date: DateTime.now(),
-      );
-
-      await context.read<FormulationProvider>().addFormulation(formulation);
-
-      await NotificationService.sendLocalNotification(
-        title: '✅ Formulation sauvegardée',
-        body: '$animal ($stage) - ${totalCost.toStringAsFixed(0)} FCFA',
-      );
-
-      Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Formulation sauvegardée avec succès'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
-
-      Navigator.popUntil(context, (route) => route.isFirst);
-    } catch (e) {
-      Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    Navigator.popUntil(context, (route) => route.isFirst);
+  } catch (e) {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Erreur: $e'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
+
+
+  // ... reste de tes méthodes (validateFormula, _isInRange, etc.)
+
+
+
 
   Widget _infoChip(String label, String value) {
     return Column(
@@ -231,10 +344,328 @@ class ResultPage extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+body: Consumer<FormulationProvider>(
+  builder: (context, provider, child) {
+    // final bool canAccess =
+    //     provider.formulations.length < 5; // Gratuit = 2 formulations max
+// final bool canAccess = provider.formulations.length < 3; // Gratuit = 3 formulations max
+final bool canAccess = _isPremium || provider.formulations.length < 3;
+
+    if (!canAccess) {
+      return Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock, size: 80, color: Colors.orange),
+            const SizedBox(height: 20),
+            const Text(
+              "Abonnement premium",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF4B2E2A),
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                "Vous avez atteint la limite de la version gratuite.\n"
+                "Payez pour débloquer les formulations illimitées.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(height: 25),
+
+
+
+
+
+
+ElevatedButton.icon(
+  onPressed: () {
+    Navigator.push(
+      context,
+      // MaterialPageRoute(builder: (context) => const PayPage()),
+          MaterialPageRoute(builder: (context) => const TestPaymentPage()),
+
+    
+    );
+  },
+  icon: const Icon(Icons.payment, color: Colors.white),
+  label: const Text(
+    "Payer maintenant",
+    style: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+  ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.orange,
+    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          ],
+        ),
+      );
+    }
+
+    // SI L’UTILISATEUR A LE DROIT → afficher ta page normale
+    return _buildResultContent(context);
+  },
+),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      //   ),
+      // ),
+    );
+  }
+
+  Widget _buildResultRow(String label, String value, {bool isHighlight = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isHighlight ? 18 : 16,
+            fontWeight: isHighlight ? FontWeight.w600 : FontWeight.normal,
+            color: const Color(0xFF4B2E2A),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: isHighlight ? 20 : 16,
+            fontWeight: FontWeight.bold,
+            color: isHighlight ? const Color(0xFFD97706) : const Color(0xFF4B2E2A),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNutritionalRow(String label, double value, String unit) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color(0xFF4B2E2A),
+          ),
+        ),
+        Text(
+          '${value.toStringAsFixed(1)} $unit',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF4B2E2A),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ✅ NOUVEAU: Widget avec validation
+  Widget _buildNutritionalRowWithValidation(
+    String label,
+    double actual,
+    double required,
+    String unit,
+  ) {
+    const double tolerance = 0.10; // 10%
+    bool isValid = _isInRange(actual, required, tolerance);
+    
+    Color statusColor = isValid ? Colors.green : Colors.orange;
+    IconData statusIcon = isValid ? Icons.check_circle : Icons.warning;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(statusIcon, color: statusColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF4B2E2A),
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              '${actual.toStringAsFixed(1)} $unit',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: statusColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Requis: ${required.toStringAsFixed(1)} $unit',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Widget _buildResultContent(BuildContext context) {
+  return SingleChildScrollView(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+          
           children: [
             // En-tête Animal/Stade
             Container(
@@ -246,8 +677,8 @@ class ResultPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _infoChip('Animal', animal),
-                  _infoChip('Stade', stage),
+                  _infoChip('Animal', widget.animal),
+                  _infoChip('Stade', widget.stage),
                 ],
               ),
             ),
@@ -296,7 +727,7 @@ class ResultPage extends StatelessWidget {
                   const Divider(height: 20),
                   _buildResultRow(
                     'Coût total',
-                    '${totalCost.toStringAsFixed(0)} FCFA',
+                    '${widget.totalCost.toStringAsFixed(0)} FCFA',
                     isHighlight: true,
                   ),
                   const Divider(height: 20),
@@ -347,32 +778,32 @@ class ResultPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // ✅ Affichage avec validation
-                  if (requirement != null) ...[
+                  if (widget.requirement != null) ...[
                     _buildNutritionalRowWithValidation(
                       'Protéines',
                       nutritionalComposition['Protéines']!,
-                      requirement!.protein,
+                      widget.requirement!.protein,
                       '%',
                     ),
                     const Divider(height: 20),
                     _buildNutritionalRowWithValidation(
                       'Énergie',
                       nutritionalComposition['Énergie']!,
-                      requirement!.energy,
+                      widget.requirement!.energy,
                       'kcal/kg',
                     ),
                     const Divider(height: 20),
                     _buildNutritionalRowWithValidation(
                       'Calcium',
                       nutritionalComposition['Calcium']!,
-                      requirement!.calcium,
+                      widget.requirement!.calcium,
                       '%',
                     ),
                     const Divider(height: 20),
                     _buildNutritionalRowWithValidation(
                       'Phosphore',
                       nutritionalComposition['Phosphore']!,
-                      requirement!.phosphore,
+                      widget.requirement!.phosphore,
                       '%',
                     ),
                   ] else ...[
@@ -402,7 +833,7 @@ class ResultPage extends StatelessWidget {
                   ],
 
                   // ✅ NOUVEAU: Indicateur global de validation
-                  if (requirement != null) ...[
+                  if (widget.requirement != null) ...[
                     const SizedBox(height: 20),
                     const Divider(),
                     const SizedBox(height: 16),
@@ -504,7 +935,7 @@ class ResultPage extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // ✅ Lignes des ingrédients
-                  ...ingredients.map((ing) {
+                  ...widget.ingredients.map((ing) {
                     // ing.quantity est une proportion entre 0 et 1
                     final proportion = (ing.quantity ?? 0) * 100; // Pourcentage
                     final quantityKg = (ing.quantity ?? 0) * totalWeight; // Kg réels
@@ -673,112 +1104,57 @@ class ResultPage extends StatelessWidget {
 
             const SizedBox(height: 16),
           ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildResultRow(String label, String value, {bool isHighlight = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isHighlight ? 18 : 16,
-            fontWeight: isHighlight ? FontWeight.w600 : FontWeight.normal,
-            color: const Color(0xFF4B2E2A),
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: isHighlight ? 20 : 16,
-            fontWeight: FontWeight.bold,
-            color: isHighlight ? const Color(0xFFD97706) : const Color(0xFF4B2E2A),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildNutritionalRow(String label, double value, String unit) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF4B2E2A),
-          ),
-        ),
-        Text(
-          '${value.toStringAsFixed(1)} $unit',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF4B2E2A),
-          ),
-        ),
-      ],
-    );
-  }
 
-  // ✅ NOUVEAU: Widget avec validation
-  Widget _buildNutritionalRowWithValidation(
-    String label,
-    double actual,
-    double required,
-    String unit,
-  ) {
-    const double tolerance = 0.10; // 10%
-    bool isValid = _isInRange(actual, required, tolerance);
-    
-    Color statusColor = isValid ? Colors.green : Colors.orange;
-    IconData statusIcon = isValid ? Icons.check_circle : Icons.warning;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(statusIcon, color: statusColor, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF4B2E2A),
-                  ),
-                ),
-              ],
-            ),
-            Text(
-              '${actual.toStringAsFixed(1)} $unit',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: statusColor,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Requis: ${required.toStringAsFixed(1)} $unit',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+    ),
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // ✅ NOUVEAU: Indicateur global
   Widget _buildValidationIndicator() {
@@ -846,7 +1222,7 @@ class ResultPage extends StatelessWidget {
       Colors.pink[400]!,
     ];
 
-    return ingredients.asMap().entries.map((entry) {
+    return widget.ingredients.asMap().entries.map((entry) {
       final index = entry.key;
       final ing = entry.value;
       final proportion = (ing.quantity ?? 0) * 100;
