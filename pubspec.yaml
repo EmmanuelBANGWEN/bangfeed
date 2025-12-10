@@ -3,10 +3,12 @@ description: "Feed Formulation Application"
 
 publish_to: 'none'
 
-version: 3.0.0+3
+version: 4.0.0+4
 
 environment:
-  sdk: ^3.8.1
+  # sdk: ^3.8.1
+  sdk: '>=3.0.0 <4.0.0' # nouveau apres le soucis avec flutter
+
 
 dependencies:
   flutter:
@@ -34,7 +36,10 @@ dependencies:
   provider: ^6.1.2
 
   # Connectivité
-  connectivity_plus: ^7.0.0
+  # connectivity_plus: ^7.0.0
+  connectivity_plus: ^6.0.3
+
+
   internet_connection_checker: ^1.0.0+1
   flutter_native_splash: ^2.4.0
   http: ^1.5.0

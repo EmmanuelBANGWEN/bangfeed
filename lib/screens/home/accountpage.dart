@@ -676,8 +676,8 @@ final isPremiumActive = _currentUser!.isPremium &&
           onTap: () {
             Navigator.push(
               context,
-              // MaterialPageRoute(builder: (context) => const PayPage()),
-              MaterialPageRoute(builder: (context) => const TestPaymentPage()),
+              MaterialPageRoute(builder: (context) => const PayPage()),
+              // MaterialPageRoute(builder: (context) => const TestPaymentPage()),
 
 
             );

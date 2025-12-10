@@ -3,12 +3,17 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LygosService {
-  // final String _apiKey = 'lygosapp-4d74643c-6bfa-4bc3-a32f-e4e8af7a9262';
+  final String _apiKey = 'lygosapp-4d74643c-6bfa-4bc3-a32f-e4e8af7a9262';
+// final String _apiKey = 'lygossandbox-e9195bd7-d239-4310-9510-f35c26d121f7'; //ancien
 
 // api de la sandbox pour faire les tests
-final String _apiKey = 'lygossandbox-e9195bd7-d239-4310-9510-f35c26d121f7';
+// final String _apiKey = 'lygossandbox-e9195bd7-d239-4310-9510-f35c26d121f7'; //ancien
+    // final String _apiKey = 'lygossandbox-7508b693-99d3-4e80-b30d-9a5c001928b6';
+  // final String _baseUrl = 'https://server-sandbox.lygosapp.com/api/v1/api/';
 
   final String _baseUrl = 'https://api.lygosapp.com/v1/';
+
+
   String? lastOrderId; // <-- AJOUT
 
   // Créer un lien de paiement

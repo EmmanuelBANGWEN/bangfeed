@@ -34,7 +34,7 @@ Stream<LocalUser?> get authStateChanges async* {
     return;
   }
 
-  await for (final user in _auth.authStateChanges()) {
+  await for (final user in _auth!.authStateChanges()) {
     if (user != null) {
       await localDb.setIsLoggedIn(true);
 
@@ -79,12 +79,12 @@ Future<void> signUpWithPhone(String phone, String password) async {
   print('🔵 [SIGNUP] Téléphone saisi: $phone');
   print('🔵 [SIGNUP] Email généré: $email');
   
-  final userCred = await _auth.createUserWithEmailAndPassword(
+  final userCred = await _auth?.createUserWithEmailAndPassword(
     email: email,
     password: password,
   );
 
-  await userCred.user?.updateDisplayName(phone);
+  await userCred?.user?.updateDisplayName(phone);
   await localDb.setIsLoggedIn(true);
 }
 
@@ -95,7 +95,7 @@ Future<void> signInWithPhone(String phone, String password) async {
   print('🟢 [SIGNIN] Téléphone saisi: $phone');
   print('🟢 [SIGNIN] Email généré: $email');
   
-  await _auth.signInWithEmailAndPassword(email: email, password: password);
+  await _auth?.signInWithEmailAndPassword(email: email, password: password);
   await localDb.setIsLoggedIn(true);
 }
 
@@ -103,7 +103,7 @@ Future<void> signInWithPhone(String phone, String password) async {
 
   Future<void> signOut() async {
     if (_auth != null) {
-      await _auth.signOut();
+      await _auth?.signOut();
     }
     await localDb.setIsLoggedIn(false);
   }

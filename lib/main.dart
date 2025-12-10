@@ -126,8 +126,8 @@ class MyApp extends StatelessWidget {
       home: AuthWrapper(isOfflineMode: isOfflineMode),
       
   routes: {
-    // '/pay': (context) => const PayPage(),
-    '/pay': (context) => const TestPaymentPage(),
+    '/pay': (context) => const PayPage(),
+    // '/pay': (context) => const TestPaymentPage(),
   },
 
     );

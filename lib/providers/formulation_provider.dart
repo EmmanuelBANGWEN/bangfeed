@@ -56,7 +56,7 @@ class FormulationProvider with ChangeNotifier {
     if (f.isSynced || _firestore == null) return;
     
     try {
-      await _firestore.syncFormulation(f);
+      await _firestore?.syncFormulation(f);
       f.isSynced = true;
       await _localDb.getFormulationBox().put(f.key, f);
       notifyListeners();
@@ -99,7 +99,7 @@ class FormulationProvider with ChangeNotifier {
     
     for (var f in pending) {
       try {
-        await _firestore.syncFormulation(f);
+        await _firestore?.syncFormulation(f);
         f.isSynced = true;
         await _localDb.getFormulationBox().put(f.key, f);
         print('✅ [PROVIDER] Formulation ${f.key} synchronisée');
@@ -129,7 +129,7 @@ class FormulationProvider with ChangeNotifier {
       // ✅ Supprimer de Firestore seulement si online ET synchronisé
       if (_firestore != null && f.isSynced) {
         try {
-          await _firestore.deleteFormulation(f);
+          await _firestore?.deleteFormulation(f);
           print('☁️ [PROVIDER] Formulation supprimée de Firestore');
         } catch (e) {
           print('⚠️ [PROVIDER] Erreur suppression Firestore: $e');

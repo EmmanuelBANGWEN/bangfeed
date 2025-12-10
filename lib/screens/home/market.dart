@@ -172,7 +172,7 @@ final List<Map<String, dynamic>> _machines = [
   {
     'name': 'Mélangeur à sec',
     'category': 'Mélangeurs',
-    'price': 450_000,
+    'price': 450000,
     'unit': 'unité',
     'image': Icons.settings,
     'color': Color(0xFF3B82F6),
@@ -185,7 +185,7 @@ final List<Map<String, dynamic>> _machines = [
   {
     'name': 'Broyeur à marteaux',
     'category': 'Broyeurs',
-    'price': 750_000,
+    'price': 750000,
     'unit': 'unité',
     'image': Icons.build_circle,
     'color': Color(0xFFEF4444),
@@ -198,7 +198,7 @@ final List<Map<String, dynamic>> _machines = [
   {
     'name': 'Ensacheuse automatique',
     'category': 'Ensacheuses',
-    'price': 1_200_000,
+    'price': 1200000,
     'unit': 'unité',
     'image': Icons.inbox,
     'color': Color(0xFFF59E0B),
@@ -211,7 +211,7 @@ final List<Map<String, dynamic>> _machines = [
   {
     'name': 'Tamis vibrant',
     'category': 'Tamis',
-    'price': 380_000,
+    'price': 380000,
     'unit': 'unité',
     'image': Icons.grid_3x3,
     'color': Color(0xFF10B981),
@@ -970,137 +970,61 @@ void _contactViaWhatsApp(Map<String, dynamic> product) async {
 
 
 
+
 void _showContactDialog(Map<String, dynamic> product) {
-  // const String phone = "+237655372703"; // Numéro du vendeur
-  // final Uri callUri = Uri(scheme: "tel", path: phone);
-  // final Uri whatsappUri = Uri.parse("https://wa.me/$phone");
+  const String phone = "+237655372703";
 
   showDialog(
     context: context,
     builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.phone_in_talk, size: 48, color: Color(0xFFD97706)),
-            const SizedBox(height: 16),
-
-            Text(
-              product['seller'],
-              style: const TextStyle(
+            const Text(
+              "Contacter le vendeur",
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF4B2E2A),
               ),
-              textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 20),
 
-            const SizedBox(height: 8),
-            Text(
-              'Contact pour: ${product['name']}',
-              style: const TextStyle(fontSize: 14, color: Color(0xFF78716C)),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 24),
-
-            // ▶️ Appeler
+            // Bouton Appel
             ElevatedButton.icon(
-
-
-              // onPressed: () async {
-              //   if (await canLaunchUrl(callUri)) {
-              //     await launchUrl(callUri);
-              //   }
-              //   Navigator.pop(context);
-              // },
-
-                onPressed: () {
-                  _launchCall("+237655372703");
-                  Navigator.pop(context);
-                },
-
-
-              icon: const Icon(Icons.phone, color: Colors.white),
-              label: const Text(
-                'Appeler le vendeur',
-                style: TextStyle(color: Colors.white),
-              ),
+              onPressed: () {
+                Navigator.pop(context);
+                _launchCall(phone);
+              },
+              icon: const Icon(Icons.phone),
+              label: const Text("Appeler"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD97706),
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                backgroundColor: Color(0xFFD97706),
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
               ),
             ),
-
             const SizedBox(height: 12),
 
-
-
-
-
-
-
-
-
-
-
-
-
-            // // ▶️ WhatsApp
-            // OutlinedButton.icon(
-            //   onPressed: () async {
-            //     if (await canLaunchUrl(whatsappUri)) {
-            //       await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-            //     }
-            //     Navigator.pop(context);
-            //   },
-            //   icon: const Icon(Icons.chat, color: Color(0xFF10B981)),
-            //   label: const Text(
-            //     'WhatsApp',
-            //     style: TextStyle(color: Color(0xFF10B981)),
-            //   ),
-            //   style: OutlinedButton.styleFrom(
-            //     side: const BorderSide(color: Color(0xFF10B981)),
-            //     minimumSize: const Size(double.infinity, 48),
-            //     shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(12),
-            //     ),
-            //   ),
-            // ),
-
-
-
-
-
-
-
-
-ElevatedButton.icon(
-  onPressed: () {
-    Navigator.pop(context);
-    _contactViaWhatsApp(product);  // 👈 Appel dynamique
-  },
-  icon: const Icon(Icons.chat, color: Colors.white),
-  label: const Text(
-    'WhatsApp',
-    style: TextStyle(color: Colors.white),
-  ),
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.green,
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-),
-
-
-
+            // Bouton WhatsApp
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                _contactViaWhatsApp(product);
+              },
+              icon: const Icon(Icons.chat),
+              label: const Text("WhatsApp"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF25D366),
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+            ),
           ],
         ),
       ),
