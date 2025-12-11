@@ -17,15 +17,15 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.bangfeed.app"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
         applicationId = "com.bangfeed.app"
-        minSdk = 23
-        targetSdk = 35
-        versionCode = 4
-        versionName = "4.0.0"
+        minSdk = flutter.minSdkVersion
+        targetSdk = 36
+        versionCode = 5
+        versionName = "5.0.0"
 
         resConfigs("en", "fr")
     }

@@ -436,6 +436,24 @@ Map<String, double> get nutritionalComposition {
                   _buildNutritionRow('Protéines', nutrition['Protéines']!),
                   const Divider(height: 24),
                   _buildNutritionRow('Énergie', nutrition['Énergie']!),
+                
+                const Divider(height: 24),
+                _buildNutritionRow('Calcium', nutrition['Calcium']!),
+                const Divider(height: 24),
+                _buildNutritionRow('Phosphore', nutrition['Phosphore']!),
+                const Divider(height: 24),
+                _buildNutritionRow('Lysine', nutrition['Lysine']!),
+                const Divider(height: 24),
+                _buildNutritionRow('Méthionine', nutrition['Méthionine']!),
+                const Divider(height: 24),
+                _buildNutritionRow('Fibres', nutrition['Fibres']!),
+                const Divider(height: 24),
+                _buildNutritionRow('Matières grasses', nutrition['Matières grasses']!),
+
+
+
+
+                
                 ],
               ),
             ),
@@ -552,29 +570,105 @@ Map<String, double> get nutritionalComposition {
     );
   }
 
-  Widget _buildNutritionRow(String label, double percentage) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 18,
-            color: Color(0xFF4B2E2A),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Text(
-          label == 'Énergie'
-              ? '${percentage.toStringAsFixed(0)} kcal/kg'
-              : '${percentage.toStringAsFixed(0)}%',
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF4B2E2A),
-          ),
-        ),
-      ],
-    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Widget _buildNutritionRow(String label, double percentage) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       Text(
+  //         label,
+  //         style: const TextStyle(
+  //           fontSize: 18,
+  //           color: Color(0xFF4B2E2A),
+  //           fontWeight: FontWeight.w500,
+  //         ),
+  //       ),
+  //       Text(
+  //         label == 'Énergie'
+  //             ? '${percentage.toStringAsFixed(0)} kcal/kg'
+  //             : '${percentage.toStringAsFixed(0)}%',
+  //         style: const TextStyle(
+  //           fontSize: 18,
+  //           fontWeight: FontWeight.bold,
+  //           color: Color(0xFF4B2E2A),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+
+
+
+
+Widget _buildNutritionRow(String label, double percentage) {
+  String unit = '%';
+  if (label == 'Énergie') {
+    unit = 'kcal/kg';
   }
+  
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 18,
+          color: Color(0xFF4B2E2A),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      Text(
+        '${percentage.toStringAsFixed(1)} $unit',
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF4B2E2A),
+        ),
+      ),
+    ],
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -3,7 +3,7 @@ description: "Feed Formulation Application"
 
 publish_to: 'none'
 
-version: 4.0.0+4
+version: 5.0.0+5
 
 environment:
   # sdk: ^3.8.1

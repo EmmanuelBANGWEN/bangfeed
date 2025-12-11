@@ -1,6 +1,6 @@
 import 'package:bangfeed/screens/payer.dart';
-import 'package:bangfeed/screens/payer_test.dart';
-import 'package:bangfeed/services/firestore_service.dart';
+// import 'package:bangfeed/screens/payer_test.dart';
+// import 'package:bangfeed/services/firestore_service.dart';
 import 'package:bangfeed/services/premium_service.dart';
 import 'package:flutter/material.dart';
 import '../models/ingredient.dart';
@@ -109,29 +109,71 @@ Future<void> _checkPremiumStatus() async {
   // ✅ Coût par kg
   double get costPerKg => widget.totalCost / totalWeight;
 
+
+
+
+
+
+
   // ✅ Composition nutritionnelle pondérée
-  Map<String, double> get nutritionalComposition {
-    double totalProtein = 0;
-    double totalEnergy = 0;
-    double totalCalcium = 0;
-    double totalPhosphore = 0;
+  // Map<String, double> get nutritionalComposition {
+  //   double totalProtein = 0;
+  //   double totalEnergy = 0;
+  //   double totalCalcium = 0;
+  //   double totalPhosphore = 0;
 
-    for (var ing in widget.ingredients) {
-      final proportion = ing.quantity ?? 0;
-      totalProtein += ing.protein * proportion;
-      totalEnergy += ing.energy * proportion;
-      totalCalcium += (ing.calcium ?? 0) * proportion;
-      totalPhosphore += (ing.phosphore ?? 0) * proportion;
-    }
+  //   for (var ing in widget.ingredients) {
+  //     final proportion = ing.quantity ?? 0;
+  //     totalProtein += ing.protein * proportion;
+  //     totalEnergy += ing.energy * proportion;
+  //     totalCalcium += (ing.calcium ?? 0) * proportion;
+  //     totalPhosphore += (ing.phosphore ?? 0) * proportion;
+  //   }
 
-    return {
-      'Protéines': totalProtein,
-      'Énergie': totalEnergy,
-      'Calcium': totalCalcium,
-      'Phosphore': totalPhosphore,
-    };
+  //   return {
+  //     'Protéines': totalProtein,
+  //     'Énergie': totalEnergy,
+  //     'Calcium': totalCalcium,
+  //     'Phosphore': totalPhosphore,
+  //   };
+  // }
+
+
+
+
+Map<String, double> get nutritionalComposition {
+  double totalProtein = 0;
+  double totalEnergy = 0;
+  double totalCalcium = 0;
+  double totalPhosphore = 0;
+  double totalLysine = 0;        // ✅ AJOUT
+  double totalMethionine = 0;    // ✅ AJOUT
+  double totalFiber = 0;         // ✅ AJOUT
+  double totalFat = 0;           // ✅ AJOUT
+
+  for (var ing in widget.ingredients) {
+    final proportion = ing.quantity ?? 0;
+    totalProtein += ing.protein * proportion;
+    totalEnergy += ing.energy * proportion;
+    totalCalcium += (ing.calcium ?? 0) * proportion;
+    totalPhosphore += (ing.phosphore ?? 0) * proportion;
+    totalLysine += (ing.lysine ?? 0) * proportion;           // ✅ AJOUT
+    totalMethionine += (ing.methionine ?? 0) * proportion;   // ✅ AJOUT
+    totalFiber += (ing.fiber ?? 0) * proportion;             // ✅ AJOUT
+    totalFat += (ing.fat ?? 0) * proportion;                 // ✅ AJOUT
   }
 
+  return {
+    'Protéines': totalProtein,
+    'Énergie': totalEnergy,
+    'Calcium': totalCalcium,
+    'Phosphore': totalPhosphore,
+    'Lysine': totalLysine,           // ✅ AJOUT
+    'Méthionine': totalMethionine,   // ✅ AJOUT
+    'Fibres': totalFiber,            // ✅ AJOUT
+    'Matières grasses': totalFat,    // ✅ AJOUT
+  };
+}
 
 
 
@@ -635,36 +677,14 @@ ElevatedButton.icon(
 
 
 
+
+
 Widget _buildResultContent(BuildContext context) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
           
           children: [
             // En-tête Animal/Stade
@@ -806,6 +826,45 @@ Widget _buildResultContent(BuildContext context) {
                       widget.requirement!.phosphore,
                       '%',
                     ),
+
+
+
+
+
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Lysine',
+    nutritionalComposition['Lysine']!,
+    widget.requirement!.lysine,
+    '%',
+  ),
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Méthionine',
+    nutritionalComposition['Méthionine']!,
+    widget.requirement!.methionine,
+    '%',
+  ),
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Fibres',
+    nutritionalComposition['Fibres']!,
+    widget.requirement!.fiber,
+    '%',
+  ),
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Matières grasses',
+    nutritionalComposition['Matières grasses']!,
+    widget.requirement!.fat,
+    '%',
+  ),
+
+
+
+
+
+
                   ] else ...[
                     _buildNutritionalRow(
                       'Protéines',
@@ -830,6 +889,38 @@ Widget _buildResultContent(BuildContext context) {
                       nutritionalComposition['Phosphore']!,
                       '%',
                     ),
+
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Lysine',
+    nutritionalComposition['Lysine']!,
+    widget.requirement!.lysine,
+    '%',
+  ),
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Méthionine',
+    nutritionalComposition['Méthionine']!,
+    widget.requirement!.methionine,
+    '%',
+  ),
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Fibres',
+    nutritionalComposition['Fibres']!,
+    widget.requirement!.fiber,
+    '%',
+  ),
+  const Divider(height: 20),
+  _buildNutritionalRowWithValidation(
+    'Matières grasses',
+    nutritionalComposition['Matières grasses']!,
+    widget.requirement!.fat,
+    '%',
+  ),
+
+
+
                   ],
 
                   // ✅ NOUVEAU: Indicateur global de validation
