@@ -24,8 +24,8 @@ android {
         applicationId = "com.bangfeed.app"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        versionCode = 5
-        versionName = "5.0.0"
+        versionCode = 6
+        versionName = "6.0.0"
 
         resConfigs("en", "fr")
     }

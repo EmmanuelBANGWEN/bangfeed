@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:bangfeed/screens/formulation_details.dart';
 import 'package:bangfeed/screens/home/accountpage.dart';
 import 'package:bangfeed/screens/home/conseils.dart';
+import 'package:bangfeed/screens/formation_page.dart';
 import 'package:bangfeed/screens/home/market.dart';
 import 'package:bangfeed/screens/payer.dart';
 import 'package:bangfeed/screens/select_animal.dart';
@@ -12,6 +14,7 @@ import 'package:provider/provider.dart';
 import '../../providers/formulation_provider.dart';
 import '../login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -106,37 +109,75 @@ class _DashboardPageState extends State<DashboardPage> {
   //   }
   // }
 
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_astuceController.hasClients) {
-        _currentAstuce = (_currentAstuce + 1) % astuces.length;
-        _astuceController.animateToPage(
-          _currentAstuce,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+//   @override
+//   void initState() {
+//     super.initState();
+//     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+//       if (_astuceController.hasClients) {
+//         _currentAstuce = (_currentAstuce + 1) % astuces.length;
+//         _astuceController.animateToPage(
+//           _currentAstuce,
+//           duration: const Duration(milliseconds: 500),
+//           curve: Curves.easeInOut,
+//         );
+//       }
+//     });
 
-      // Appel et mise à jour UI si besoin
-    // checkPremium().then((isP) {
-    //   print("PREMIUM STATUS: $isP");
-    //   setState(() {
-    //     _isPremium = isP;
-    //   });
-    // });
+//       // Appel et mise à jour UI si besoin
+//     // checkPremium().then((isP) {
+//     //   print("PREMIUM STATUS: $isP");
+//     //   setState(() {
+//     //     _isPremium = isP;
+//     //   });
+//     // });
 
-PremiumService().checkPremiumStatus().then((isP) {
-  print("PREMIUM STATUS: $isP");
-  setState(() {
-    _isPremium = isP;
-  });
-});
+// PremiumService().checkPremiumStatus().then((isP) {
+//   print("PREMIUM STATUS: $isP");
+//   setState(() {
+//     _isPremium = isP;
+//   });
+// });
 
 
+//   }
+
+
+  static List<String> astucesAleatoires = [];
+
+
+
+
+@override
+void initState() {
+  super.initState();
+
+  if (astucesAleatoires.isEmpty) {
+    astucesAleatoires = List.from(astuces)..shuffle(Random());
   }
+
+  // ✅ CORRECTION : Initialise directement sans vérifier isActive
+  _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    if (_astuceController.hasClients) {
+      _currentAstuce = (_currentAstuce + 1) % astucesAleatoires.length;
+      _astuceController.animateToPage(
+        _currentAstuce,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  });
+
+  PremiumService().checkPremiumStatus().then((isP) {
+    print("PREMIUM STATUS: $isP");
+    setState(() {
+      _isPremium = isP;
+    });
+  });
+}
+
+
+
+
 
   @override
   void dispose() {
@@ -144,6 +185,14 @@ PremiumService().checkPremiumStatus().then((isP) {
     _astuceController.dispose();
     super.dispose();
   }
+
+  // @override
+  // void dispose() {
+  //   // ✅ NE PAS annuler le timer ni dispose le controller ici
+  //   // Ils doivent persister entre les pages
+  //   super.dispose();
+  // }
+
 
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -424,7 +473,39 @@ PopupMenuButton<String>(
 
           const SizedBox(height: 16),
 
-          // --- ASTUCE DU JOUR ---
+          // // --- ASTUCE DU JOUR ---
+          // Container(
+          //   height: 60,
+          //   margin: const EdgeInsets.symmetric(horizontal: 16),
+          //   padding: const EdgeInsets.symmetric(horizontal: 16),
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     borderRadius: BorderRadius.circular(16),
+          //     boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 4)],
+          //   ),
+          //   child: PageView.builder(
+          //     controller: _astuceController,
+          //     physics: const NeverScrollableScrollPhysics(),
+          //     itemCount: astuces.length,
+          //     itemBuilder: (context, index) {
+          //       return Row(
+          //         children: [
+          //           const Icon(Icons.lightbulb, color: Color(0xFFD97706), size: 32),
+          //           const SizedBox(width: 12),
+          //           Expanded(
+          //             child: Text(
+          //               astuces[index],
+          //               style: const TextStyle(fontSize: 16, color: Color(0xFF4B2E2A)),
+          //             ),
+          //           ),
+          //         ],
+          //       );
+          //     },
+          //   ),
+          // ),
+
+
+          // ✅ ASTUCE DU JOUR (avec astuces aléatoires)
           Container(
             height: 60,
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -437,7 +518,7 @@ PopupMenuButton<String>(
             child: PageView.builder(
               controller: _astuceController,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: astuces.length,
+              itemCount: astucesAleatoires.length,
               itemBuilder: (context, index) {
                 return Row(
                   children: [
@@ -445,7 +526,7 @@ PopupMenuButton<String>(
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        astuces[index],
+                        astucesAleatoires[index],
                         style: const TextStyle(fontSize: 16, color: Color(0xFF4B2E2A)),
                       ),
                     ),
@@ -454,6 +535,8 @@ PopupMenuButton<String>(
               },
             ),
           ),
+
+
 
           const SizedBox(height: 16),
 
@@ -495,13 +578,15 @@ PopupMenuButton<String>(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const MarketPage()),
+                      // MaterialPageRoute(builder: (_) => const MarketPage()),
+                      MaterialPageRoute(builder: (_) => const FormationPage()),
                     );
                   },
                     icon: const Icon(Icons.store, color: Colors.white),
                     label: const Text(
                       
-                      "Marché",
+                      // "Marché",
+                      "Formations",
                     style: TextStyle(color: Colors.white),
 
                     
@@ -516,6 +601,78 @@ PopupMenuButton<String>(
               ],
             ),
           ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          // ✅ 3 BOUTONS : CONSEILS, FORMATIONS, MARCHÉ
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16),
+          //   child: Row(
+          //     children: [
+          //       Expanded(
+          //         child: _buildActionButton(
+          //           context,
+          //           icon: Icons.school,
+          //           label: "Conseils",
+          //           color: const Color(0xFFD97706),
+          //           onTap: () {
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(builder: (_) => const ConseilsPage()),
+          //             );
+          //           },
+          //         ),
+          //       ),
+          //       const SizedBox(width: 12),
+          //       Expanded(
+          //         child: _buildActionButton(
+          //           context,
+          //           icon: Icons.video_library,
+          //           label: "Formations",
+          //           color: const Color(0xFFEA580C),
+          //           onTap: () {
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(builder: (_) => const FormationPage()),
+          //             );
+          //           },
+          //         ),
+          //       ),
+          //       const SizedBox(width: 12),
+          //       Expanded(
+          //         child: _buildActionButton(
+          //           context,
+          //           icon: Icons.store,
+          //           label: "Marché",
+          //           color: const Color(0xFF0EA5E9),
+          //           onTap: () {
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(builder: (_) => const MarketPage()),
+          //             );
+          //           },
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+
 
           const SizedBox(height: 16),
 
@@ -566,6 +723,40 @@ PopupMenuButton<String>(
       ),
     );
   }
+
+
+  
+  // ✅ Bouton d'action unifié
+  Widget _buildActionButton(BuildContext context,
+      {required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 28),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
   /// --- WIDGETS SECONDAIRES ---
   Widget _buildEmptyState() {

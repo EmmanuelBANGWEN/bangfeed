@@ -288,6 +288,7 @@ Future<void> _autoCheckPayment() async {
                     ),
                     const SizedBox(height: 15),
                     _buildFeature('Formulations illimitées', Icons.all_inclusive),
+                    _buildFeature('Formations illimitées', Icons.all_inclusive),
                     _buildFeature('Accès prioritaire', Icons.star),
                     _buildFeature('Support premium', Icons.support_agent),
                     _buildFeature('Nouvelles fonctionnalités en avant-première', Icons.new_releases),

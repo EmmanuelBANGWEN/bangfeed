@@ -735,7 +735,8 @@ final isPremiumActive = _currentUser!.isPremium &&
           const SizedBox(height: 16),
           _buildInfoRow('Version', 'BangFeed 1.0'),
           const Divider(height: 20),
-          _buildInfoRow('Support', 'bikoyemmanuel531@gmail.com'),
+          // _buildInfoRow('Support', 'bikoyemmanuel531@gmail.com'),
+          _buildInfoRow('Support', '+23765537703'),
         ],
       ),
     );
