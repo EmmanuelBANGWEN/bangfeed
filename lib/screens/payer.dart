@@ -15,86 +15,170 @@ class PayPage extends StatefulWidget {
 class _PayPageState extends State<PayPage> {
   final LygosService _lygosService = LygosService();
   bool _loading = false;
+  String? _currentOrderId;
 
-  Future<void> _pay() async {
-    setState(() => _loading = true);
+  // Future<void> _pay() async {
+  //   setState(() => _loading = true);
 
-    try {
-      final orderId = DateTime.now().millisecondsSinceEpoch.toString();
+  //   try {
+  //     final uid = FirebaseAuth.instance.currentUser!.uid;
+  //     final orderId = DateTime.now().millisecondsSinceEpoch.toString();
 
-      final paymentData = await _lygosService.createPayment(
-        amount: 1000,
-        shopName: 'BangFeed',
-        orderId: orderId,
-        message: 'Abonnement premium BangFeed',
-        successUrl: 'https://bangfeed.com/success',
-        failureUrl: 'https://bangfeed.com/failure',
-      );
+  //     // 🔥 ÉTAPE 1: Enregistrer dans Firestore AVANT le paiement
+  //     await FirebaseFirestore.instance
+  //         .collection('pending_payments')
+  //         .doc(orderId)
+  //         .set({
+  //       'uid': uid,
+  //       'status': 'pending',
+  //       'amount': 1000,
+  //       'createdAt': FieldValue.serverTimestamp(),
+  //     });
 
-      final paymentUrl = paymentData['link'];
+  //     print('💾 Order enregistré: $orderId pour $uid');
 
-      final uri = Uri.parse(paymentUrl);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    Future.delayed(const Duration(seconds: 3), () {
-  _autoCheckPayment();
-});
+  //     // ÉTAPE 2: Créer le paiement Lygos
+  //     final paymentData = await _lygosService.createPayment(
+  //       amount: 1000,
+  //       shopName: 'BangFeed',
+  //       orderId: orderId,
+  //       message: 'Abonnement premium BangFeed',
+  //       successUrl: 'https://bangri.site/success',
+  //       failureUrl: 'https://bangri.site/failure',
+  //     );
 
-    
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur de paiement: $e')),
-      );
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
+  //     final paymentUrl = paymentData['link'];
+  //     final uri = Uri.parse(paymentUrl);
+  //     await launchUrl(uri, mode: LaunchMode.externalApplication);
 
-  Future<void> _confirmPayment() async {
-    final orderId = _lygosService.lastOrderId;
+  //     // ✅ Plus besoin de vérification manuelle !
+      
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Erreur de paiement: $e')),
+  //     );
+  //   } finally {
+  //     setState(() => _loading = false);
+  //   }
+  // }
 
-    if (orderId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Aucun paiement à vérifier")),
-      );
-      return;
-    }
+void _listenPaymentStatus() {
+  if (_currentOrderId == null) return;
 
-    final status = await _lygosService.getPayinStatus(orderId);
+  FirebaseFirestore.instance
+      .collection('pending_payments')
+      .doc(_currentOrderId)
+      .snapshots()
+      .listen((doc) {
+    if (!doc.exists) return;
 
-    if (status == "success") {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      await PremiumService().activatePremium(uid);
+    final data = doc.data()!;
+    final status = data['status'];
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Premium activé 🎉")),
-      );
+    if (status == 'completed') {
+      print('✅✅ PAIEMENT CONFIRMÉ POUR $_currentOrderId');
+
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('✅ Paiement confirmé, Premium activé'),
+    backgroundColor: Colors.green,
+  ),
+);
+
+
+    } else if (status == 'failed') {
+      print('❌❌ PAIEMENT ÉCHOUÉ POUR $_currentOrderId');
+      
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Paiement non confirmé : $status")),
-      );
+      print('⏳ Paiement en cours... statut=$status');
     }
-  }
-
-
-@override
-void initState() {
-  super.initState();
-  _autoCheckPayment();
+  });
 }
 
 
+Future<void> _pay() async {
+  setState(() => _loading = true);
 
-Future<void> _autoCheckPayment() async {
-  final status = await _lygosService.checkSavedPaymentStatus();
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    // Vérification 1 : Utilisateur connecté ?
+    if (user == null) {
+      throw Exception('Vous devez être connecté pour effectuer un paiement');
+    }
+    
+    final uid = user.uid;
+    final orderId = DateTime.now().millisecondsSinceEpoch.toString();
 
-  if (status == "success") {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    await PremiumService().activatePremium(uid);
+    print('🔵 Début du paiement');
+    print('👤 UID: $uid');
+    print('🆔 Order ID: $orderId');
 
+    // 🔥 ÉTAPE 1: Enregistrer dans Firestore AVANT le paiement
+    print('💾 Enregistrement dans Firestore...');
+    await FirebaseFirestore.instance
+        .collection('pending_payments')
+        .doc(orderId)
+        .set({
+      'uid': uid,
+      'status': 'pending',
+      'amount': 1000,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    print('✅ Order enregistré: $orderId pour $uid');
+
+    // ÉTAPE 2: Créer le paiement Lygos
+    print('💳 Création du paiement Lygos...');
+    final paymentData = await _lygosService.createPayment(
+      amount: 1000,
+      shopName: 'BangFeed',
+      orderId: orderId,
+      message: 'Abonnement premium BangFeed',
+      successUrl: 'https://bangri.site/success',
+      failureUrl: 'https://bangri.site/failure',
+    );
+
+    print('✅ Paiement créé: ${paymentData['link']}');
+    _currentOrderId = orderId;
+print('🆔 Order ID: $orderId');
+
+    // ÉTAPE 3: Ouvrir le lien
+    final paymentUrl = paymentData['link'];
+    if (paymentUrl == null || paymentUrl.isEmpty) {
+      throw Exception('Lien de paiement invalide');
+    }
+
+    final uri = Uri.parse(paymentUrl);
+    print('🌐 Ouverture du lien: $uri');
+    
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    _listenPaymentStatus();
+
+    if (!launched) {
+      throw Exception('Impossible d\'ouvrir le lien de paiement');
+    }
+
+    print('✅ Paiement lancé avec succès');
+    
+  } catch (e, stackTrace) {
+    print('❌ ERREUR COMPLÈTE:');
+    print('Message: $e');
+    print('Type: ${e.runtimeType}');
+    print('StackTrace: $stackTrace');
+    
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✨ Paiement confirmé automatiquement ! Premium activé")),
+        SnackBar(
+          content: Text('Erreur de paiement: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
       );
+    }
+  } finally {
+    if (mounted) {
+      setState(() => _loading = false);
     }
   }
 }
@@ -102,6 +186,79 @@ Future<void> _autoCheckPayment() async {
 
   @override
   Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    // 🔥 StreamBuilder pour écouter le statut premium en temps réel
+    return StreamBuilder<DocumentSnapshot>(
+      stream: uid != null
+          ? FirebaseFirestore.instance.collection('users').doc(uid).snapshots()
+          : null,
+      builder: (context, snapshot) {
+        // Vérifier si l'utilisateur est premium
+        if (snapshot.hasData) {
+          final data = snapshot.data?.data() as Map<String, dynamic>?;
+          final isPremium = data?['isPremium'] ?? false;
+
+          if (isPremium) {
+            // ✅ Afficher un écran de succès
+            return Scaffold(
+              backgroundColor: Colors.grey[50],
+              appBar: AppBar(
+                title: const Text('Premium activé'),
+                backgroundColor: Colors.green,
+              ),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 100,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      '✨ Vous êtes Premium !',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Profitez de toutes les fonctionnalités',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 15,
+                        ),
+                      ),
+                      child: const Text(
+                        'Retour à l\'application',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        }
+
+        // 🔄 Afficher la page de paiement normale
+        return _buildPaymentPage();
+      },
+    );
+  }
+
+  // 📄 Ton UI actuel déplacé dans une fonction séparée
+  Widget _buildPaymentPage() {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -247,7 +404,7 @@ Future<void> _autoCheckPayment() async {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
-                        'Économisez 1000 FCFA',
+                        'Economisez 1000 FCFA',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -324,21 +481,6 @@ Future<void> _autoCheckPayment() async {
                         ),
                 ),
               ),
-
-              const SizedBox(height: 15),
-
-              // Bouton confirmation
-              // TextButton.icon(
-              //   onPressed: _confirmPayment,
-              //   icon: const Icon(Icons.check_circle_outline),
-              //   label: const Text('Confirmer mon paiement'),
-              //   style: TextButton.styleFrom(
-              //     foregroundColor: const Color(0xFFD97706),
-              //   ),
-              // ),
-
-
-
 
               const SizedBox(height: 20),
 

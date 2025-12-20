@@ -265,7 +265,7 @@ class _ModuleLecturePageState extends State<ModuleLecturePage> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Seulement 2000 FCFA/mois',
+              'Seulement 1000 FCFA/mois',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

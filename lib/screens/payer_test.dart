@@ -12,7 +12,7 @@
 
 // class _TestPaymentPageState extends State<TestPaymentPage> {
 //   final LygosService _lygosService = LygosService();
-//   final TextEditingController _amountController = TextEditingController(text: '101');
+//   final TextEditingController _amountController = TextEditingController(text: '1000');
 //   final TextEditingController _orderIdController = TextEditingController();
   
 //   bool _loading = false;
@@ -48,8 +48,8 @@
 //         shopName: 'BangFeed TEST',
 //         orderId: orderId,
 //         message: 'Test paiement BangFeed',
-//         successUrl: 'https://bangfeed.com/success',
-//         failureUrl: 'https://bangfeed.com/failure',
+//         successUrl: 'https://bangri.site/success',
+//         failureUrl: 'https://bangri.site/failure',
 //       );
 
 //       setState(() {

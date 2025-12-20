@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  // URL du groupe WhatsApp - À remplacer par votre lien
+  // URL du groupe WhatsApp - Ã€ remplacer par votre lien
   static const String whatsappGroupUrl = 'https://chat.whatsapp.com/Jv1gMwJw54oLhnh1Up4zqk?mode=wwt';
 
   @override
@@ -29,10 +29,10 @@ class _LoginPageState extends State<LoginPage> {
     if (!isOffline) {
       try {
       } catch (e) {
-        print('⚠️ [LOGIN] FirebaseAuth non disponible: $e');
+        print('âš ï¸ [LOGIN] FirebaseAuth non disponible: $e');
       }
     } else {
-      print('📴 [LOGIN] Mode offline - FirebaseAuth désactivé');
+      print('ðŸ“´ [LOGIN] Mode offline - FirebaseAuth dÃ©sactivÃ©');
     }
   }
 
@@ -204,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Mode hors ligne\nConnexion limitée aux comptes locaux',
+                            'Mode hors ligne\nConnexion limitÃ©e aux comptes locaux',
                             style: TextStyle(
                               color: const Color(0xFF4B2E2A),
                               fontSize: 12,
@@ -242,13 +242,13 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 24),
                       
-                      // Champ téléphone
+                      // Champ tÃ©lÃ©phone
                       TextField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
                         style: const TextStyle(color: Color(0xFF4B2E2A)),
                         decoration: InputDecoration(
-                          labelText: 'Numéro de téléphone',
+                          labelText: 'NumÃ©ro de tÃ©lÃ©phone',
                           labelStyle: TextStyle(color: const Color(0xFF4B2E2A).withOpacity(0.6)),
                           prefixIcon: const Icon(Icons.phone, color: Color(0xFFD97706)),
                           filled: true,
@@ -380,7 +380,7 @@ class _LoginPageState extends State<LoginPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Rejoignez notre communauté',
+                                  'Rejoignez notre communautÃ©',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,

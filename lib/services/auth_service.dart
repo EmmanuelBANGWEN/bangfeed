@@ -38,7 +38,7 @@ Stream<LocalUser?> get authStateChanges async* {
     if (user != null) {
       await localDb.setIsLoggedIn(true);
 
-      // 🔹 Récupérer isPremium depuis Firestore
+      // ðŸ”¹ RÃ©cupÃ©rer isPremium depuis Firestore
       final userData = await FirestoreService().getUserData(user.uid);
       final isPremium = userData?['isPremium'] == true;
 
@@ -76,8 +76,8 @@ Future<void> signUpWithPhone(String phone, String password) async {
   if (_auth == null) throw Exception('Mode hors ligne: inscription impossible');
 
   final email = phoneToPseudoEmail(phone);
-  print('🔵 [SIGNUP] Téléphone saisi: $phone');
-  print('🔵 [SIGNUP] Email généré: $email');
+  print('ðŸ”µ [SIGNUP] TÃ©lÃ©phone saisi: $phone');
+  print('ðŸ”µ [SIGNUP] Email gÃ©nÃ©rÃ©: $email');
   
   final userCred = await _auth?.createUserWithEmailAndPassword(
     email: email,
@@ -92,8 +92,8 @@ Future<void> signInWithPhone(String phone, String password) async {
   if (_auth == null) throw Exception('Mode hors ligne: connexion impossible');
 
   final email = phoneToPseudoEmail(phone);
-  print('🟢 [SIGNIN] Téléphone saisi: $phone');
-  print('🟢 [SIGNIN] Email généré: $email');
+  print('ðŸŸ¢ [SIGNIN] TÃ©lÃ©phone saisi: $phone');
+  print('ðŸŸ¢ [SIGNIN] Email gÃ©nÃ©rÃ©: $email');
   
   await _auth?.signInWithEmailAndPassword(email: email, password: password);
   await localDb.setIsLoggedIn(true);
@@ -108,7 +108,7 @@ Future<void> signInWithPhone(String phone, String password) async {
     await localDb.setIsLoggedIn(false);
   }
 
-  // Méthode pour se connecter en mode offline
+  // MÃ©thode pour se connecter en mode offline
   Future<void> signInOffline() async {
     await localDb.setIsLoggedIn(true);
   }
@@ -157,7 +157,7 @@ Future<void> signInWithPhone(String phone, String password) async {
 //   // Si pas premium, retourne false
 //   if (!(data['isPremium'] ?? false)) return false;
 
-//   // Vérifie la date d'expiration
+//   // VÃ©rifie la date d'expiration
 //   final premiumUntilStr = data['premiumUntil'];
 //   if (premiumUntilStr == null) return false;
 
@@ -181,7 +181,7 @@ Future<void> signInWithPhone(String phone, String password) async {
 //   if (isPremium && premiumUntil != null) {
 //     final now = DateTime.now();
 
-//     // Premium expiré
+//     // Premium expirÃ©
 //     if (premiumUntil.toDate().isBefore(now)) {
 //       // On remet premium = false
 //       await FirestoreService().updateUser(uid, {

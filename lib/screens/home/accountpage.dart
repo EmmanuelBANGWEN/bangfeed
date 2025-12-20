@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:bangfeed/providers/formulation_provider.dart';
 import 'package:bangfeed/screens/payer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 
@@ -241,18 +242,34 @@ Future<void> _loadUserData() async {
 
                       const SizedBox(height: 20),
 
-                      // ═══════════════════════════════════════
-                      // SECTION 4: BOUTON UPGRADE (si gratuit)
-                      // ═══════════════════════════════════════
-                      if (!_currentUser!.isPremium) ...[
-                        _buildUpgradeButton(),
-                        const SizedBox(height: 20),
-                      ],
+                      // // ═══════════════════════════════════════
+                      // // SECTION 4: BOUTON UPGRADE (si gratuit)
+                      // // ═══════════════════════════════════════
+                      // if (!_currentUser!.isPremium) ...[
+                      //   _buildUpgradeButton(),
+                      //   const SizedBox(height: 20),
+                      // ],
 
-                      // ═══════════════════════════════════════
-                      // SECTION 5: INFORMATIONS SUPPLÉMENTAIRES
-                      // ═══════════════════════════════════════
-                      _buildInfoCard(),
+                      // // ═══════════════════════════════════════
+                      // // SECTION 5: INFORMATIONS SUPPLÉMENTAIRES
+                      // // ═══════════════════════════════════════
+                      // _buildInfoCard(),
+
+// SECTION 4: BOUTON UPGRADE (si gratuit)
+if (!_currentUser!.isPremium) ...[
+  _buildUpgradeButton(),
+  const SizedBox(height: 20),
+],
+
+// SECTION 5: COMMUNAUTÉ WHATSAPP (VISIBLE POUR TOUS)
+_buildWhatsAppCommunityCard(),
+
+const SizedBox(height: 20),
+
+// SECTION 6: INFORMATIONS SUPPLÉMENTAIRES
+_buildInfoCard(),
+
+
                     ],
                   ),
                 ),
@@ -489,7 +506,128 @@ final isPremiumActive = _currentUser!.isPremium &&
 
 
 
+Widget _buildWhatsAppCommunityCard() {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 20,
+          offset: const Offset(0, 10),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF25D366).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.groups,
+                color: Color(0xFF25D366),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Rejoignez notre communauté',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4B2E2A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Groupe WhatsApp BangFeed',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: const Color(0xFF4B2E2A).withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: OutlinedButton.icon(
+            onPressed: _joinWhatsAppGroup,
+            icon: const Icon(Icons.chat, size: 20),
+            label: const Text(
+              'Rejoindre le groupe',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF25D366),
+              side: const BorderSide(
+                color: Color(0xFF25D366),
+                width: 1.5,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
+Future<void> _joinWhatsAppGroup() async {
+  const String whatsappGroupUrl = 'https://chat.whatsapp.com/Jv1gMwJw54oLhnh1Up4zqk?mode=wwt';
+  final Uri url = Uri.parse(whatsappGroupUrl);
+  
+  try {
+    if (await canLaunchUrl(url)) {
+      await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Impossible d\'ouvrir WhatsApp'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
+  }
+}
 
 
 

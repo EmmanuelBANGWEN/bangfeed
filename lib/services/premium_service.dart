@@ -4,15 +4,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// Service centralisé pour gérer le statut premium
 /// Vérifie à la fois isPremium ET premiumUntil
 class PremiumService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore? _firestore;
+  final bool _isOffline;
+
+  // ✅ Constructeur qui gère le mode offline
+  PremiumService({bool? isOffline}) 
+      : _isOffline = isOffline ?? false,
+        _firestore = (isOffline == true) ? null : FirebaseFirestore.instance;
   
   /// Vérifie si l'utilisateur est premium ET que son abonnement est encore valide
   Future<bool> checkPremiumStatus() async {
+    // ✅ En mode offline, retourne false
+    if (_isOffline || _firestore == null) {
+      print('⚠️ Mode offline - Premium status non disponible');
+      return false;
+    }
+
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return false;
 
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore!.collection('users').doc(user.uid).get();
       if (!doc.exists) return false;
 
       final data = doc.data();
@@ -43,7 +55,7 @@ class PremiumService {
       }
 
       // ❗ Premium expiré → désactiver automatiquement
-      await _firestore.collection('users').doc(user.uid).update({
+      await _firestore!.collection('users').doc(user.uid).update({
         'isPremium': false,
       });
 
@@ -56,10 +68,14 @@ class PremiumService {
 
   /// Active le premium pour 30 jours
   Future<void> activatePremium(String uid) async {
+    if (_isOffline || _firestore == null) {
+      throw Exception('Mode offline: activation premium impossible');
+    }
+
     final now = DateTime.now();
     final premiumUntil = now.add(const Duration(days: 30));
 
-    await _firestore.collection('users').doc(uid).set({
+    await _firestore!.collection('users').doc(uid).set({
       'isPremium': true,
       'premiumUntil': premiumUntil.toIso8601String(),
       'updatedAt': FieldValue.serverTimestamp(),
@@ -68,6 +84,13 @@ class PremiumService {
 
   /// Récupère les données utilisateur avec statut premium validé
   Future<Map<String, dynamic>> getUserPremiumData() async {
+    if (_isOffline || _firestore == null) {
+      return {
+        'isPremium': false,
+        'premiumUntil': null,
+      };
+    }
+
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       return {
@@ -78,7 +101,7 @@ class PremiumService {
 
     final isPremium = await checkPremiumStatus();
     
-    final doc = await _firestore.collection('users').doc(user.uid).get();
+    final doc = await _firestore!.collection('users').doc(user.uid).get();
     final data = doc.data();
     
     DateTime? premiumUntil;

@@ -62,12 +62,12 @@ class LygosQuickTest {
           'api-key': apiKey,
         },
         body: jsonEncode({
-          'amount': 101,
+          'amount': 1000,
           'shop_name': 'BangFeed Test',
           'order_id': orderId,
           'message': 'Test rapide',
-          'success_url': 'https://bangri.site/success',
-          'failure_url': 'https://bangri.site/failure',
+          'success_url': 'https://bangri.site/lygos/success_lygos',
+          'failure_url': 'https://bangri.site/lygos/failed_lygos',
         }),
       );
 

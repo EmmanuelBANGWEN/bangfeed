@@ -34,40 +34,109 @@ void main() async {
     await Hive.openBox<Formulation>('formulations');
     print('✅ Hive initialisé et boxes ouvertes');
 
-    // ✅ Étape 3 : Vérifier Internet
-    final hasInternet = await InternetConnectionChecker().hasConnection;
-    print(hasInternet ? '✅ Internet disponible' : '⚠️ Pas de connexion Internet');
-    bool isOfflineMode = !hasInternet;
 
-    // ✅ Étape 4 : Initialiser Firebase + Notifications
-    if (hasInternet) {
-      try {
-        await Firebase.initializeApp();
-        FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
-        await NotificationService.initialize();
-        print('✅ Firebase & Notifications initialisés');
-      } catch (e) {
-        print('⚠️ Erreur Firebase: $e - mode offline activé');
-        isOfflineMode = true;
-      }
-    }
 
-    // ✅ Étape 5 : Initialiser services
-    final localDb = LocalDbService();
-    await localDb.init();
-    print('✅ LocalDbService initialisé');
 
-    FirestoreService? firestoreService;
-    if (!isOfflineMode) {
-      try {
-        firestoreService = FirestoreService();
-        print('✅ FirestoreService initialisé');
-      } catch (e) {
-        print('⚠️ Erreur FirestoreService: $e - offline activé');
-        firestoreService = null;
-        isOfflineMode = true;
-      }
-    }
+
+    // // ✅ Étape 3 : Vérifier Internet
+    // final hasInternet = await InternetConnectionChecker().hasConnection;
+    // print(hasInternet ? '✅ Internet disponible' : '⚠️ Pas de connexion Internet');
+    // bool isOfflineMode = !hasInternet;
+
+
+
+
+// // ✅ Étape 3 : Vérifier Internet avec timeout
+// bool hasInternet = false;
+// try {
+//   hasInternet = await InternetConnectionChecker()
+//       .hasConnection
+//       .timeout(const Duration(seconds: 3)); // ⏱️ Timeout de 3 secondes
+//   print(hasInternet ? '✅ Internet disponible' : '⚠️ Pas de connexion Internet');
+// } catch (e) {
+//   print('⚠️ Timeout connexion Internet: $e - mode offline activé');
+//   hasInternet = false;
+// }
+// bool isOfflineMode = !hasInternet;
+
+    // // ✅ Étape 4 : Initialiser Firebase + Notifications
+    // if (hasInternet) {
+    //   try {
+    //     await Firebase.initializeApp();
+    //     FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+    //     await NotificationService.initialize();
+    //     print('✅ Firebase & Notifications initialisés');
+    //   } catch (e) {
+    //     print('⚠️ Erreur Firebase: $e - mode offline activé');
+    //     isOfflineMode = true;
+    //   }
+    // }
+
+
+
+
+    // // ✅ Étape 5 : Initialiser services
+    // final localDb = LocalDbService();
+    // await localDb.init();
+    // print('✅ LocalDbService initialisé');
+
+
+
+
+
+
+
+
+
+
+// ✅ Étape 3 : Vérifier Internet avec timeout
+bool hasInternet = false;
+try {
+  hasInternet = await InternetConnectionChecker()
+      .hasConnection
+      .timeout(const Duration(seconds: 2));
+  print(hasInternet ? '✅ Internet disponible' : '⚠️ Pas de connexion Internet');
+} catch (e) {
+  print('⚠️ Pas de connexion Internet - mode offline');
+  hasInternet = false;
+}
+bool isOfflineMode = !hasInternet;
+
+// ✅ Étape 4 : Initialiser Firebase SEULEMENT si Internet disponible
+FirestoreService? firestoreService;
+if (hasInternet) {
+  try {
+    await Firebase.initializeApp()
+        .timeout(const Duration(seconds: 5));
+    FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+    await NotificationService.initialize()
+        .timeout(const Duration(seconds: 3));
+    firestoreService = FirestoreService();
+    print('✅ Firebase & Notifications initialisés');
+  } catch (e) {
+    print('⚠️ Erreur Firebase: $e - mode offline');
+    isOfflineMode = true;
+    firestoreService = null;
+  }
+}
+
+// ✅ Étape 5 : Initialiser LocalDbService
+final localDb = LocalDbService();
+await localDb.init();
+print('✅ LocalDbService initialisé');
+
+
+    // FirestoreService? firestoreService;
+    // if (!isOfflineMode) {
+    //   try {
+    //     firestoreService = FirestoreService();
+    //     print('✅ FirestoreService initialisé');
+    //   } catch (e) {
+    //     print('⚠️ Erreur FirestoreService: $e - offline activé');
+    //     firestoreService = null;
+    //     isOfflineMode = true;
+    //   }
+    // }
 
     // ✅ Étape 6 : Lancer l’application
     runApp(
@@ -133,58 +202,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// class AuthWrapper extends StatelessWidget {
-//   final bool isOfflineMode;
-//   const AuthWrapper({super.key, required this.isOfflineMode});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final localDb = Provider.of<LocalDbService>(context, listen: false);
-//     final authService = AuthService(localDb, isOfflineMode: isOfflineMode);
-
-//     return StreamBuilder(
-//       stream: authService.authStateChanges,
-//       builder: (context, snapshot) {
-//         if (snapshot.connectionState == ConnectionState.waiting) {
-//           return const Scaffold(
-//             body: Center(
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   CircularProgressIndicator(),
-//                   SizedBox(height: 16),
-//                   Text('Chargement...'),
-//                 ],
-//               ),
-//             ),
-//           );
-//         }
-
-//         if (snapshot.hasError) {
-//           return Scaffold(
-//             body: Center(
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Icon(Icons.error_outline, size: 48, color: const Color(0xFFD97706)),
-//                   SizedBox(height: 16),
-//                   Text('Erreur: une erreur est survenue'),
-//                 ],
-//               ),
-//             ),
-//           );
-//         }
-
-//         if (snapshot.hasData && snapshot.data != null) {
-//           return const DashboardPage();
-//         }
-
-//         return const LoginPage();
-//       },
-//     );
-//   }
-// }
 
 
 

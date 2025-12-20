@@ -446,6 +446,9 @@ class _FormationPageState extends State<FormationPage> {
     );
   }
 
+
+
+
   Widget _buildFormationCard(Formation formation) {
     return Card(
       elevation: 2,
@@ -491,39 +494,91 @@ class _FormationPageState extends State<FormationPage> {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: formation.color.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            formation.niveau,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: formation.color,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
-                        Text(
-                          formation.duree,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(Icons.play_circle_outline, size: 14, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${formation.modules} modules',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
+
+
+
+                    // Row(
+                    //   children: [
+                    //     Container(
+                    //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    //       decoration: BoxDecoration(
+                    //         color: formation.color.withOpacity(0.1),
+                    //         borderRadius: BorderRadius.circular(6),
+                    //       ),
+                    //       child: Text(
+                    //         formation.niveau,
+                    //         style: TextStyle(
+                    //           fontSize: 11,
+                    //           fontWeight: FontWeight.w600,
+                    //           color: formation.color,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 8),
+                    //     Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
+                    //     const SizedBox(width: 4),
+                    //     Text(
+                    //       formation.duree,
+                    //       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    //     ),
+                    //     const SizedBox(width: 8),
+                    //     Icon(Icons.play_circle_outline, size: 14, color: Colors.grey[600]),
+                    //     const SizedBox(width: 4),
+                    //     Text(
+                    //       '${formation.modules} modules',
+                    //       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    //     ),
+                    //   ],
+                    // ),
+
+Wrap(
+  spacing: 8,
+  runSpacing: 6,
+  crossAxisAlignment: WrapCrossAlignment.center,
+  children: [
+    Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: formation.color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        formation.niveau,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: formation.color,
+        ),
+      ),
+    ),
+
+    Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
+        const SizedBox(width: 4),
+        Text(
+          formation.duree,
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+      ],
+    ),
+
+    Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.play_circle_outline, size: 14, color: Colors.grey[600]),
+        const SizedBox(width: 4),
+        Text(
+          '${formation.modules} modules',
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+      ],
+    ),
+  ],
+)
+
+
                   ],
                 ),
               ),
@@ -906,14 +961,26 @@ void _showFormationDetails(Formation formation) {
 
                   const SizedBox(height: 24),
 
+
+
                   // Informations rapides
-                  Row(
-                    children: [
-                      _buildInfoChip(Icons.access_time, formation.duree),
-                      const SizedBox(width: 12),
-                      _buildInfoChip(Icons.play_circle_outline, '${formation.modules} modules'),
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     _buildInfoChip(Icons.access_time, formation.duree),
+                  //     const SizedBox(width: 12),
+                  //     _buildInfoChip(Icons.play_circle_outline, '${formation.modules} modules'),
+                  //   ],
+                  // ),
+Wrap(
+  spacing: 12,
+  runSpacing: 12,
+  children: [
+    _buildInfoChip(Icons.access_time, formation.duree),
+    _buildInfoChip(Icons.play_circle_outline, '${formation.modules} modules'),
+  ],
+),
+
+
 
                   const SizedBox(height: 20),
 
